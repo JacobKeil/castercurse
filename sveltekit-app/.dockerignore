@@ -1,0 +1,18 @@
+# Docker-specific
+Dockerfile
+.dockerignore
+
+# SvelteKit cache and build outputs
+.svelte-kit/
+
+# Node dependencies
+node_modules/
+
+# IDE and OS files
+.vscode/
+.idea/
+*.DS_Store
+
+# Environment variables (should not be in Docker image)
+.env
+.env.*

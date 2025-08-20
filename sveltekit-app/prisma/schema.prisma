@@ -1,0 +1,94 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  handle       String    @unique
+  display_name String
+  events       Event[]
+  teams        Team[]
+  channels     Channel[]
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+}
+
+model Event {
+  id                String      @id @default(uuid())
+  name              String
+  max_teams         Int?
+  logo_url          String?
+  start_date        DateTime
+  end_date          DateTime
+  main_broadcast    Channel?    @relation("main_broadcast", fields: [main_broadcast_id], references: [id])
+  main_broadcast_id String?     @unique // A channel can only be the main broadcast for one event
+  watch_parties     Channel[]   @relation("watch_parties")
+  teams             Team[]      @relation("teams")
+  status            EventStatus @relation(fields: [status_id], references: [id])
+  status_id         String
+  links             EventLink[]
+  created_by        User        @relation(fields: [created_by_id], references: [id])
+  created_by_id     String
+  created_at        DateTime    @default(now())
+  updated_at        DateTime    @updatedAt
+}
+
+model Channel {
+  id             String   @id @default(uuid())
+  display_name   String
+  handle         String   @unique
+  team           Team?    @relation(fields: [team_id], references: [id])
+  team_id        String?
+  created_by     User     @relation(fields: [created_by_id], references: [id])
+  created_by_id  String
+  watch_parties  Event[]  @relation("watch_parties")
+  main_broadcast Event?   @relation("main_broadcast")
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+}
+
+model Team {
+  id            String    @id @default(uuid())
+  name          String
+  callsign      String?
+  logo_url      String?
+  region        Region    @relation(fields: [region_id], references: [id])
+  region_id     String
+  channels      Channel[]
+  created_by    User      @relation(fields: [created_by_id], references: [id])
+  created_by_id String
+  events        Event[]   @relation("teams")
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+}
+
+model Region {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  teams      Team[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model EventStatus {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  events     Event[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model EventLink {
+  id       String @id @default(uuid())
+  label    String
+  url      String
+  event    Event  @relation(fields: [event_id], references: [id])
+  event_id String
+}
