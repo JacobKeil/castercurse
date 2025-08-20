@@ -70,8 +70,6 @@
 
 			localStorage.setItem('last_page', current_page);
 		};
-
-		// console.log(window.navigator.userAgent.includes('Edg, Chrome, Firefox'));
 	});
 
 	$effect(() => {
