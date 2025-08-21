@@ -27,9 +27,10 @@
 	let cookie_notice_shown: boolean = $state(false);
 	let browser: string | null = $state(null);
 	let home_screen = $derived(page.url.pathname === '/' || page.url.pathname === '/events');
-	let view_screen =
-		$derived(page.url.pathname.includes('view') ||
-		(page.url.pathname.includes('events') && page.url.pathname !== '/events'));
+	let view_screen = $derived(
+		page.url.pathname.includes('view') ||
+			(page.url.pathname.includes('events') && page.url.pathname !== '/events')
+	);
 
 	onMount(() => {
 		if (localStorage.getItem('theme') !== 'dark') {
@@ -47,9 +48,9 @@
 		}
 
 		if (!cookies_notice_store) {
-			cookie_notice_shown = true
+			cookie_notice_shown = true;
 		} else {
-			cookie_notice_shown = false
+			cookie_notice_shown = false;
 		}
 
 		$settings = settings_store ? JSON.parse(settings_store) : default_settings;
@@ -62,13 +63,13 @@
 			if (e.key === 'Escape' && !$stream_manager_open) {
 				current_stream.set(null);
 			}
-			if (e.key === 'c') {
-				settings.set({
-					...$settings,
-					open_chat: !$settings.open_chat
-				})
-				localStorage.setItem('settings', JSON.stringify($settings));
-			}
+			// if (e.key === 'c') {
+			// 	settings.set({
+			// 		...$settings,
+			// 		open_chat: !$settings.open_chat
+			// 	})
+			// 	localStorage.setItem('settings', JSON.stringify($settings));
+			// }
 		});
 
 		window.onbeforeunload = function () {
@@ -182,18 +183,15 @@
 	</div>
 	<main
 		class={cls(
-			'scroll-smooth bg-zinc-900 overflow-hidden',
+			'overflow-hidden scroll-smooth bg-zinc-900',
 			view_screen && 'h-[calc(100vh_-_50px)]',
 			home_screen && 'min-h-[calc(100vh_-_50px)]'
 		)}
 	>
 		<section
-			class={cls(
-				$current_stream && $settings.open_chat && 'grid grid-cols-[auto_400px]',
-				'h-full'
-			)}
+			class={cls($current_stream && $settings.open_chat && 'grid grid-cols-[auto_400px]', 'h-full')}
 		>
-		{@render children()}
+			{@render children()}
 			{#if $current_stream && $settings.open_chat && view_screen}
 				<div
 					in:fly={{ x: 400, duration: 300 }}
@@ -219,8 +217,18 @@
 	<StreamManager {supabase} />
 </Drawer>
 
-<Dialog bind:open={cookie_notice_shown} class="mobile:max-w-[600px] m-6 max-h-[calc(50%)] w-full" classes={{ backdrop: 'bg-zinc-800/80'}} persistent>
-  <div class="p-2">
-		<CookieNotice close={() => { cookie_notice_shown = false }} {browser} />
+<Dialog
+	bind:open={cookie_notice_shown}
+	class="m-6 max-h-[calc(50%)] w-full mobile:max-w-[600px]"
+	classes={{ backdrop: 'bg-zinc-800/80' }}
+	persistent
+>
+	<div class="p-2">
+		<CookieNotice
+			close={() => {
+				cookie_notice_shown = false;
+			}}
+			{browser}
+		/>
 	</div>
 </Dialog>
