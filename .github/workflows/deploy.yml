@@ -46,6 +46,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /root/Castercurse
-            docker-compose pull sveltekit
-            docker-compose up -d --no-deps sveltekit
+            docker pull ${{ env.DOCKER_IMAGE }}:latest
+            docker compose up -d --no-deps sveltekit
             docker image prune -f
