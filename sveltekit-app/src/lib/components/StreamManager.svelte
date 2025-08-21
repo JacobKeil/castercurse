@@ -5,7 +5,7 @@
 		current_stream,
 		MAX_CHANNELS,
 		stream_manager_open,
-		hide_stream
+		toggle_hidden
 	} from '$lib/stores/streams';
 	import { AddChannel, Settings, ToggleHidden, ToggleSource, Broadcast, TeamSection } from '$lib';
 	import { onMount } from 'svelte';
@@ -204,10 +204,10 @@
 							tabindex="0"
 							onkeydown={(e) => {
 								handle_keydown(e, () => {
-									hide_stream(channel)
+									toggle_hidden(channel)
 								});
 							}}
-							onclick={() => { hide_stream(channel) }}
+							onclick={() => { toggle_hidden(channel) }}
 						>
 							<i
 								class="fa-solid fa-eye fa-sm cursor-pointer"

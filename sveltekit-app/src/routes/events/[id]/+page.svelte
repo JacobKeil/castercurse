@@ -3,8 +3,7 @@
 	import {
 		channels,
 		current_stream,
-		hide_stream,
-		mute_stream,
+		toggle_hidden,
 		render_source,
 		stream_manager_open,
 		toggle_mute,
@@ -40,7 +39,7 @@
         (team_original) => {
           const transformed_channels: ChannelWithLive[] = team_original.channels.map(
             (channel_original) => {
-              const is_live = true;
+              const is_live = false;
               return {
                 ...channel_original,
                 is_live,
@@ -199,11 +198,11 @@
 								tabindex="0"
 								onkeydown={(e) => {
 									handle_keydown(e, () => {
-										hide_stream(channel);
+										toggle_hidden(channel);
 									});
 								}}
 								onclick={() => {
-									hide_stream(channel);
+									toggle_hidden(channel);
 								}}
 								class:text-zinc-400={!channel.hidden}
 								class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-zinc-700 py-1 duration-300 hover:bg-zinc-600"
@@ -215,11 +214,11 @@
 								tabindex="0"
 								onkeydown={(e) => {
 									handle_keydown(e, () => {
-										mute_stream(channel);
+										toggle_mute(channel);
 									});
 								}}
 								onclick={() => {
-									mute_stream(channel);
+									toggle_mute(channel);
 								}}
 								class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-zinc-700 py-1 duration-300 hover:bg-zinc-600"
 								class:text-zinc-400={channel.muted}

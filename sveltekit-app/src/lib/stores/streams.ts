@@ -19,22 +19,67 @@ const current_stream_in_list = derived(
   }
 )
 
-export function toggle_mute(channel: Channel) {
-    const chs = get(channels);
-    if (channel.muted && channel.un_mute && channel.play) {
-      channel.un_mute();
-      if (channel.hidden) {
-        channel.hidden = false;
-        channel.play();
-      }
-      chs.forEach((ch) => {
-        if (ch.id !== channel.id) {
-          if (ch.mute) {
-            ch.mute();
-          }
-        }
-      });
+export function un_mute(channel: Channel) {
+  const chs = get(channels);
+  if (channel.muted && channel.un_mute && channel.play) {
+    channel.un_mute();
+    if (channel.hidden) {
+      channel.hidden = false;
+      channel.play();
     }
+    chs.forEach((ch) => {
+      if (ch.id !== channel.id) {
+        if (ch.mute) {
+          ch.mute();
+        }
+      }
+    });
+  }
+}
+
+export function toggle_mute(channel: Channel) {
+  const chs = get(channels);
+  if (channel.muted && channel.un_mute && channel.play) {
+    channel.un_mute();
+    if (channel.hidden) {
+      channel.hidden = false;
+      channel.play();
+    }
+    chs.forEach((ch) => {
+      if (ch.id !== channel.id) {
+        if (ch.mute) {
+          ch.mute();
+        }
+      }
+    });
+  } else if (!channel.muted && channel.mute) {
+    channel.mute()
+  }
+}
+  
+export function toggle_hidden(channel: Channel) {
+  const chs = get(channels);
+  if (!channel.hidden && channel.mute && channel.pause) {
+    channel.muted = true;
+    channel.mute();
+    channel.pause();
+
+    const stream = get(current_stream);
+
+    if (stream !== null && channel.id === stream.id) {
+      current_stream.set(null);
+    }
+  } else if (channel.hidden && channel.play) {
+    channel.play();
+  }
+
+  channels.set(
+    chs.map(ch =>
+      ch.id === channel.id
+        ? { ...ch, hidden: !ch.hidden }
+        : ch
+    )
+  )
 }
 
 export function unhide_all() {
@@ -48,38 +93,6 @@ export function unhide_all() {
   channels.set(chs);
 }
 
-export function hide_stream(channel: Channel) {
-  if (!channel.hidden && channel.mute && channel.pause) {
-    channel.muted = true;
-    channel.mute();
-    channel.pause();
-
-    const stream = get(current_stream);
-
-    if (stream !== null && channel.id === stream.id) {
-      current_stream.set(null);
-    }
-  } else if (channel.hidden && channel.play) {
-    channel.play();
-    channel.hidden = false;
-  }
-  channel.hidden = !channel.hidden;
-}
-
-export function mute_stream(channel: Channel) {
-  channel.muted = !channel.muted;
-  if (channel.muted && channel.mute) {
-    channel.mute();
-  } else if (!channel.muted && channel.un_mute) {
-    let channel_list = get(channels);
-    channel.un_mute();
-    channel_list.forEach((ch) => {
-      if (ch.id !== channel.id && ch.mute) {
-        ch.mute();
-      }
-    });
-  }
-}
 
 current_stream_in_list.subscribe(is_still_there => {
   if (!is_still_there) {

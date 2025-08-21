@@ -1,52 +1,30 @@
 services:
-  postgres:
-    image: postgres:16
+  sveltekit:
+    image: jkeil/sveltekit-castercurse:latest
     restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: castercurse_2025
-      POSTGRES_DB: main
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+    env_file: .env
     networks:
       - app-network
 
-  sveltekit:
-    build:
-      context: ./sveltekit-app
-      dockerfile: Dockerfile
-      args:
-        - DATABASE_URL
-        - PUBLIC_SUPABASE_ANON_KEY
-        - PUBLIC_SUPABASE_URL
-        - PUBLIC_TWITCH_CLIENT_ID
-        - SECRET_TWITCH_SECRET
-        - PUBLIC_TWITCH_AUTH_CALLBACK
+  postgres:
+    image: postgres:15
     restart: always
-    environment:
-      DATABASE_URL: "postgresql://postgres:castercurse_2025@postgres:5432/main"
-      PUBLIC_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inltb2Zkbnh1and6b2lzdHd5YmZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3MzU2MTUsImV4cCI6MjA2NjMxMTYxNX0.sVb36I12wJsDbiQ9lSKvB4YmYkcwqe0derPts4U1bFM"
-      PUBLIC_SUPABASE_URL: "https://ymofdnxujwzoistwybff.supabase.co"
-      PUBLIC_TWITCH_CLIENT_ID: "38bup0bxm8jsdqp3i7dvbwb5uu13w3"
-      SECRET_TWITCH_SECRET: "ezgx8o4tpqvvr5i12afkxejjzvckgq"
-      PUBLIC_TWITCH_AUTH_CALLBACK: "https://ymofdnxujwzoistwybff.supabase.co/auth/v1/callback"
-    depends_on:
-      - postgres
+    env_file: .env
+    volumes:
+      - ./data/postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
 
   nginx:
-    image: nginx:alpine
+    image: nginx:latest
     restart: always
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-      # Mount volumes for Certbot
-      - ./nginx/certbot/conf:/etc/letsencrypt
-      - ./nginx/certbot/www:/var/www/certbot
-    command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./data/certbot_data/conf:/etc/letsencrypt
+      - ./data/certbot_data/www:/var/www/certbot
     depends_on:
       - sveltekit
     networks:
@@ -55,15 +33,9 @@ services:
   certbot:
     image: certbot/certbot
     volumes:
-      # Mount volumes to share with Nginx
-      - ./nginx/certbot/conf:/etc/letsencrypt
-      - ./nginx/certbot/www:/var/www/certbot
-    # Command to check for renewal every 12 hours
+      - ./data/certbot_data/conf:/etc/letsencrypt
+      - ./data/certbot_data/www:/var/www/certbot
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-
-volumes:
-  postgres_data:
-    driver: local
 
 networks:
   app-network:

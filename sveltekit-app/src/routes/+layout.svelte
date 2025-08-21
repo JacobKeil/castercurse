@@ -59,15 +59,20 @@
 				if (!$channels[parseInt(e.key) - 1]) return;
 				set_stream($channels[parseInt(e.key) - 1]);
 			}
-
 			if (e.key === 'Escape' && !$stream_manager_open) {
 				current_stream.set(null);
+			}
+			if (e.key === 'c') {
+				settings.set({
+					...$settings,
+					open_chat: !$settings.open_chat
+				})
+				localStorage.setItem('settings', JSON.stringify($settings));
 			}
 		});
 
 		window.onbeforeunload = function () {
 			const current_page = window.location.href;
-
 			localStorage.setItem('last_page', current_page);
 		};
 	});
@@ -156,7 +161,6 @@
 						<Button on:click={toggle}>
 							<div class="flex items-center gap-3">
 								<Avatar size="sm"><img src={user?.user_metadata.avatar_url} alt="" /></Avatar>
-								<!-- <h1 class="text-sm text-gray-400">{user?.user_metadata.nickname}</h1> -->
 							</div>
 							<Menu
 								{open}
