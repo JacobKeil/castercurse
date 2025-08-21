@@ -33,7 +33,6 @@ declare module '$env/static/private' {
 	export const ALLUSERSPROFILE: string;
 	export const ANDROID_HOME: string;
 	export const APPDATA: string;
-	export const BUN_WHICH_IGNORE_CWD: string;
 	export const CHROME_CRASHPAD_PIPE_NAME: string;
 	export const COLORTERM: string;
 	export const CommonProgramFiles: string;
@@ -47,7 +46,6 @@ declare module '$env/static/private' {
 	export const GOPATH: string;
 	export const HOMEDRIVE: string;
 	export const HOMEPATH: string;
-	export const INIT_CWD: string;
 	export const INTEL_DEV_REDIST: string;
 	export const JABBA_HOME: string;
 	export const JAVA_HOME: string;
@@ -56,9 +54,11 @@ declare module '$env/static/private' {
 	export const LOGONSERVER: string;
 	export const MIC_LD_LIBRARY_PATH: string;
 	export const NODE: string;
+	export const NODE_ENV: string;
 	export const npm_config_local_prefix: string;
 	export const npm_config_user_agent: string;
 	export const npm_execpath: string;
+	export const npm_lifecycle_event: string;
 	export const npm_node_execpath: string;
 	export const npm_package_json: string;
 	export const npm_package_name: string;
@@ -142,7 +142,6 @@ declare module '$env/dynamic/private' {
 		ALLUSERSPROFILE: string;
 		ANDROID_HOME: string;
 		APPDATA: string;
-		BUN_WHICH_IGNORE_CWD: string;
 		CHROME_CRASHPAD_PIPE_NAME: string;
 		COLORTERM: string;
 		CommonProgramFiles: string;
@@ -156,7 +155,6 @@ declare module '$env/dynamic/private' {
 		GOPATH: string;
 		HOMEDRIVE: string;
 		HOMEPATH: string;
-		INIT_CWD: string;
 		INTEL_DEV_REDIST: string;
 		JABBA_HOME: string;
 		JAVA_HOME: string;
@@ -165,9 +163,11 @@ declare module '$env/dynamic/private' {
 		LOGONSERVER: string;
 		MIC_LD_LIBRARY_PATH: string;
 		NODE: string;
+		NODE_ENV: string;
 		npm_config_local_prefix: string;
 		npm_config_user_agent: string;
 		npm_execpath: string;
+		npm_lifecycle_event: string;
 		npm_node_execpath: string;
 		npm_package_json: string;
 		npm_package_name: string;

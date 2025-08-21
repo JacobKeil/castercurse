@@ -24,6 +24,7 @@ COPY . .
 
 # Generate the Prisma client and build the SvelteKit application
 RUN bunx prisma generate
+RUN printenv
 RUN bun run build
 
 
