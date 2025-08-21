@@ -28,7 +28,7 @@ model Event {
   start_date        DateTime
   end_date          DateTime
   main_broadcast    Channel?    @relation("main_broadcast", fields: [main_broadcast_id], references: [id])
-  main_broadcast_id String?     @unique // A channel can only be the main broadcast for one event
+  main_broadcast_id String?
   watch_parties     Channel[]   @relation("watch_parties")
   teams             Team[]      @relation("teams")
   status            EventStatus @relation(fields: [status_id], references: [id])
@@ -49,7 +49,7 @@ model Channel {
   created_by     User     @relation(fields: [created_by_id], references: [id])
   created_by_id  String
   watch_parties  Event[]  @relation("watch_parties")
-  main_broadcast Event?   @relation("main_broadcast")
+  main_broadcast Event[]  @relation("main_broadcast")
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
 }
