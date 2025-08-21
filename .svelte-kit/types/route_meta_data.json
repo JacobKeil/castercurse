@@ -1,0 +1,38 @@
+{
+	"/": [
+		"src/routes/+layout.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/api/event/[id]": [
+		"src/routes/api/event/[id]/+server.ts"
+	],
+	"/api/logout": [
+		"src/routes/api/logout/+server.ts"
+	],
+	"/api/streams": [
+		"src/routes/api/streams/+server.ts"
+	],
+	"/api/vods_clips": [
+		"src/routes/api/vods_clips/+server.ts"
+	],
+	"/auth/callback": [
+		"src/routes/auth/callback/+server.ts"
+	],
+	"/events": [
+		"src/routes/events/+page.server.ts",
+		"src/routes/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/events/[id]": [
+		"src/routes/events/[id]/+page.server.ts",
+		"src/routes/+layout.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/view": [
+		"src/routes/view/+page.server.ts",
+		"src/routes/+layout.ts",
+		"src/routes/+layout.server.ts"
+	]
+}
