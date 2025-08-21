@@ -1,12 +1,7 @@
-import { SECRET_TWITCH_SECRET } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { PUBLIC_TWITCH_CLIENT_ID } from '$env/static/public';
 import { error, type Cookies } from '@sveltejs/kit';
 
-/**
- * Refreshes an expired Twitch access token.
- * @param refresh_token The refresh token from the user's cookies.
- * @returns An object with the new access token and its expiry, or null if it fails.
- */
 async function refresh_access_token(refresh_token: string) {
 	try {
 		const response = await fetch(`https://id.twitch.tv/oauth2/token`, {
@@ -14,7 +9,7 @@ async function refresh_access_token(refresh_token: string) {
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 			body: new URLSearchParams({
 				client_id: PUBLIC_TWITCH_CLIENT_ID,
-				client_secret: SECRET_TWITCH_SECRET,
+				client_secret: env.SECRET_TWITCH_SECRET,
 				grant_type: 'refresh_token',
 				refresh_token: refresh_token
 			})
@@ -37,13 +32,6 @@ async function refresh_access_token(refresh_token: string) {
 	}
 }
 
-/**
- * A wrapper to make authenticated requests to the Twitch API.
- * It automatically handles token refreshing and retries.
- * @param url The full Twitch API URL to fetch.
- * @param cookies The cookies object from the SvelteKit request event.
- * @returns A Response object from the successful Twitch API call.
- */
 export async function make_twitch_api_request(url: string, cookies: Cookies) {
 	let access_token = cookies.get('oauth_provider_token');
 	const refresh_token_value = cookies.get('oauth_provider_refresh_token');

@@ -15,6 +15,13 @@ declare global {
     // interface PageState {}
     // interface Platform {}
   }
+  namespace NodeJS {
+    interface ProcessEnv {
+      SECRET_TWITCH_SECRET: string;
+      DATABASE_URL: string;
+      // Add any other of your private runtime secrets here
+    }
+  }
 }
 
 export {}
