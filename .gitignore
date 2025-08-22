@@ -131,7 +131,6 @@ dist
 
 build/
 .svelte-kit/
-prisma/migrations
 nginx/
 *.mjs
 *.sh
