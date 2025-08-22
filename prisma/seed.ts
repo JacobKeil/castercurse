@@ -1,46 +1,38 @@
-import { PrismaClient } from '@prisma/client';
-import * as data from './data.ts';
+// Example of a correct seed script structure
 
-const prisma = new PrismaClient();
+import { PrismaClient } from '@prisma/client'
+// Assuming your data file is in the same directory and named 'data.ts'
+import { region, status, user, event } from './data'
+
+const prisma = new PrismaClient()
 
 async function main() {
-  console.log(`Seeding started...`);
-
-  // Seed simple models first
-  for (const r of data.region) {
-    await prisma.region.upsert({ where: { name: r.name }, update: {}, create: r });
+  console.log('Seeding simple models...')
+  // 1. Seed the independent data first
+  for (const r of region) {
+    await prisma.region.upsert({ where: { name: r.name }, update: {}, create: r })
   }
-  for (const s of data.status) {
-    await prisma.eventStatus.upsert({ where: { name: s.name }, update: {}, create: s });
+  for (const s of status) {
+    await prisma.eventStatus.upsert({ where: { name: s.name }, update: {}, create: s })
   }
-  for (const u of data.user) {
-    await prisma.user.upsert({ where: { handle: u.handle }, update: {}, create: u });
-  }
-
-  // Seed complex models like Event
-  for (const eventData of data.event) {
-    const existingEvent = await prisma.event.findFirst({
-      where: { name: eventData.name },
-    });
-
-    if (!existingEvent) {
-      await prisma.event.create({
-        data: eventData,
-      });
-      console.log(`Created event: "${eventData.name}"`);
-    } else {
-      console.log(`Event "${eventData.name}" already exists, skipping.`);
-    }
+  for (const u of user) {
+    await prisma.user.upsert({ where: { handle: u.handle }, update: {}, create: u })
   }
 
-  console.log(`Seeding finished.`);
+  console.log('Seeding complex models...')
+  // 2. Now that the simple data exists, seed the event data that connects to it
+  for (const e of event) {
+    await prisma.event.create({
+      data: e,
+    })
+  }
 }
 
 main()
   .catch((e) => {
-    console.error(e);
-    // process.exit(1);
+    console.error(e)
+    process.exit(1)
   })
   .finally(async () => {
-    await prisma.$disconnect();
-  });
+    await prisma.$disconnect()
+  })
