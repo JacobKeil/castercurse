@@ -44,8 +44,7 @@ model Channel {
   id             String   @id @default(uuid())
   display_name   String
   handle         String   @unique
-  team           Team?    @relation(fields: [team_id], references: [id])
-  team_id        String?
+  teams          Team[]   @relation("ChannelsOnTeams")
   created_by     User     @relation(fields: [created_by_id], references: [id])
   created_by_id  String
   watch_parties  Event[]  @relation("watch_parties")
@@ -61,7 +60,7 @@ model Team {
   logo_url      String?
   region        Region    @relation(fields: [region_id], references: [id])
   region_id     String
-  channels      Channel[]
+  channels      Channel[] @relation("ChannelsOnTeams")
   created_by    User      @relation(fields: [created_by_id], references: [id])
   created_by_id String
   events        Event[]   @relation("teams")
