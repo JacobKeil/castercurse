@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { handle_keydown } from '$lib/helpers';
 	import moment from 'moment';
 
 	interface EventType {
@@ -19,30 +20,59 @@
 		player_count: number;
 	}
 
-	let { 
-		event, 
+	let {
+		event,
 		is_live = false,
-		is_completed = false
-	}: { 
-		event: EventType; 
-		is_live?: boolean; 
-		is_completed?: boolean 
+		is_completed = false,
+		is_draft = false,
+		to_edit = false
+	}: {
+		event: EventType;
+		is_live?: boolean;
+		is_completed?: boolean;
+		is_draft?: boolean;
+		to_edit?: boolean;
 	} = $props();
+
+	const start = moment(event.start_date);
+	const now = moment();
+
+	const diff_hours = start.diff(now, 'hours', true);
+	const is_soon = diff_hours >= 0 && diff_hours < 6;
+	const hours_rounded = Math.max(1, Math.ceil(diff_hours));
 </script>
 
-<!-- svelte-ignore a11y_click_events_have_key_events -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
+	role="button"
+	tabindex="0"
 	onclick={() => {
-		goto(`/events/${event.id}`);
+		if (to_edit) {
+			goto(`/organize/${event.id}`);
+		} else {
+			goto(`/events/${event.id}`);
+		}
+	}}
+	onkeydown={(e) => {
+		handle_keydown(e, () => {
+			if (to_edit) {
+				goto(`/organize/${event.id}`);
+			} else {
+				goto(`/events/${event.id}`);
+			}
+		});
 	}}
 	class="cursor-pointer rounded-md bg-zinc-800 p-4 duration-200 hover:-translate-y-1"
 >
 	<div class="mb-4 flex items-center justify-between">
-		<h1 class="text-xl text-zinc-200">{event.name}</h1>
+		<h1 class="text-xl text-zinc-300">{event.name}</h1>
 		{#if is_live}
-			<div class="bg-danger/90 w-fit rounded-md px-4 py-1">
+			<div class="w-fit rounded-sm bg-danger/90 px-4 py-1 text-xs">
 				<h1>LIVE</h1>
+			</div>
+		{/if}
+		{#if is_draft}
+			<div class="w-fit rounded-sm bg-yellow-500 px-4 py-1 text-xs font-medium text-zinc-800">
+				<h1>DRAFT</h1>
 			</div>
 		{/if}
 		{#if is_completed}
@@ -51,7 +81,15 @@
 	</div>
 	<section class="space-y-5">
 		<div class="grid grid-cols-[auto_1fr_1fr] grid-rows-2 items-center gap-2">
-			<img class="row-span-2 w-[80px] rounded-lg" src={event.logo_url} alt="" />
+			{#if event.logo_url}
+				<img class="row-span-2 w-[80px] rounded-lg" src={event.logo_url} alt="" />
+			{:else}
+				<div
+					class="group row-span-2 grid aspect-square h-full w-[88px] cursor-pointer place-content-center rounded-lg border-2 border-dashed border-zinc-600 bg-cover bg-center hover:border-red-400"
+				>
+					<i class="fa-solid fa-image text-zinc-400 group-hover:text-red-400"></i>
+				</div>
+			{/if}
 			<div class="flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-zinc-700/50">
 				<span class="text-zinc-300">{event.team_count}</span>
 				<span class="text-zinc-400">{event.team_count === 1 ? 'Team' : 'Teams'}</span>
@@ -65,18 +103,25 @@
 			>
 				<span class="flex items-center gap-2 text-zinc-300"
 					><p>Hosted by</p>
-					<span class="font-light text-[#9e7ddb]">{event.created_by.display_name}</span></span
+					<span class="font-light text-red-400">{event.created_by.display_name}</span></span
 				>
 			</div>
 		</div>
 		<div>
-			{#if is_completed}
+			{#if !is_completed && is_soon}
+				<h1 class="text-sm text-zinc-400">
+					LIVE IN <span class="text-red-400"
+						>{hours_rounded} {hours_rounded === 1 ? 'HOUR' : 'HOURS'}</span
+					>
+				</h1>
+			{:else if is_completed}
 				<h1 class="text-sm text-zinc-400">WAS LIVE ON</h1>
 			{:else}
 				<h1 class="text-sm text-zinc-400">LIVE ON</h1>
 			{/if}
+
 			<h1 class="text-zinc-300">
-				{moment(event.start_date).format('dddd, MMMM Do YYYY [at] h:mmA')}
+				{moment(event.start_date).format('dddd, MMMM Do YYYY [at] h:mm A')}
 			</h1>
 		</div>
 	</section>

@@ -1,6 +1,7 @@
 import type { EventLink, EventStatus, Prisma, User } from "@prisma/client";
 
 import type { Channel as PrismaChannel } from '@prisma/client';
+import z from "zod";
 
 export type ChannelWithLive = PrismaChannel & {
   is_live: boolean;
@@ -114,3 +115,10 @@ export type EventWithChannelsLive = Prisma.EventGetPayload<{
   links: EventLink[];
   status: EventStatus;
 };
+
+export interface CreateActionResult {
+  status: 'success' | 'error' | 'info';
+  action: 'create' | 'update' | 'delete';
+  message: string;
+  name: string;
+}

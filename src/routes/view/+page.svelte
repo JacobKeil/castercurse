@@ -14,7 +14,6 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import type { Channel } from '$lib/types';
-	import { uniqueId } from '@layerstack/utils';
 	import { handle_keydown } from '$lib/helpers';
 	import { receive, send } from '$lib/actions/transition';
 	let { data } = $props();
@@ -41,7 +40,7 @@
 					$channels = [
 						...$channels,
 						{
-							id: uniqueId(),
+							id: ch,
 							handle: ch,
 							hidden: false,
 							muted: true
@@ -76,7 +75,6 @@
 	<meta name="description" content="Multi-view" />
 </svelte:head>
 
-<!-- svelte-ignore element_invalid_self_closing_tag -->
 <section class="flex h-full w-full items-center justify-center">
 	<div
 		class={cls(
@@ -88,8 +86,6 @@
 			{#each $channels.filter((ch) => !ch.hidden) as channel, i (channel.id)}
 				<div
 					animate:flip={{ duration: 150 }}
-					in:receive={{ key: i }}
-					out:send={{ key: i }}
 					class={cls(
 						channel.hidden && 'hidden',
 						$current_stream && $current_stream.id !== channel.id ? 'hidden' : 'block',
@@ -129,7 +125,7 @@
 								<i
 									class:text-yellow-300={$current_stream?.id === channel.id}
 									class="fa-solid fa-star cursor-pointer text-sm"
-								/>
+								></i>
 							</div>
 							<div
 								role="button"
@@ -145,7 +141,7 @@
 								class:text-zinc-400={!channel.hidden}
 								class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-zinc-700 py-1 duration-300 hover:bg-zinc-600"
 							>
-								<i class="fa-solid fa-eye-slash cursor-pointer text-sm" />
+								<i class="fa-solid fa-eye-slash cursor-pointer text-sm"></i>
 							</div>
 							<div
 								role="button"
@@ -162,9 +158,9 @@
 								class:text-zinc-400={channel.muted}
 								class:text-danger={!channel.muted}
 							>
-								<i class="fa-solid fa-volume cursor-pointer text-sm" />
+								<i class="fa-solid fa-volume cursor-pointer text-sm"></i>
 							</div>
-							<VodsClips handle={channel.handle} supabase={data.supabase} />
+							<VodsClips handle={channel.handle} />
 						</div>
 					{/if}
 					<TwitchEmbed render_source={$render_source} {channel} initialMuted={channel.muted} />
@@ -189,3 +185,183 @@
 		{/if}
 	</div>
 </section>
+
+<!-- <script lang="ts">
+	import { VodsClips, TwitchEmbed } from '$lib/components';
+	import {
+		channels,
+		current_stream,
+		toggle_hidden,
+		render_source,
+		stream_manager_open,
+		toggle_mute,
+		channels_order
+	} from '$lib/stores/streams';
+	import type { Channel } from '$lib/types';
+	import { cls } from '@layerstack/tailwind';
+	import { settings } from '$lib/stores/settings';
+	import { onMount } from 'svelte';
+	import { page } from '$app/state';
+	import { handle_keydown } from '$lib/helpers';
+	import { flip } from 'svelte/animate';
+
+	let { data } = $props();
+
+	// ensure orderIds contains all current channels (append any missing at the end, keep existing order)
+	$effect(() => {
+		const have = new Set($channels_order);
+		const next = $channels_order.slice();
+		for (const ch of $channels) if (!have.has(ch.id)) next.push(ch.id);
+		// prune removed channels
+		const chSet = new Set($channels.map((c) => c.id));
+		const cleaned = next.filter((id) => chSet.has(id));
+		if (
+			cleaned.length !== $channels_order.length ||
+			cleaned.some((id, i) => id !== $channels_order[i])
+		) {
+			$channels_order = cleaned;
+		}
+	});
+
+	// Build helpers from visual order
+	function order_of(id: string) {
+		const idx = $channels_order.indexOf(id);
+		return idx === -1 ? 1e9 : idx; // unknown at far end
+	}
+
+	// visible list in visual order (for layout math)
+	let visible = $derived(
+		$channels.filter((ch) => !ch.hidden).sort((a, b) => order_of(a.id) - order_of(b.id))
+	);
+
+	let vIndex = $derived(new Map(visible.map((ch, i) => [ch.id, i])));
+	let vLen = $derived(visible.length);
+
+	// Persist/restore just like before, but do NOT regenerate ids
+	onMount(() => {
+		const saved = localStorage.getItem('/view');
+		if (page.url.pathname === '/view' && saved) {
+			const handles: string[] = JSON.parse(saved);
+			if (handles.length > 0) {
+				$channels = handles.map((h) => ({
+					id: h,
+					handle: h,
+					hidden: false,
+					muted: true
+				}));
+				channels_order.set(handles.slice());
+			}
+		}
+	});
+
+	// Save only handles (your previous behavior)
+	$effect(() => {
+		localStorage.setItem('/view', JSON.stringify($channels.map((ch) => ch.handle)));
+	});
+
+	function set_stream(channel: Channel) {
+		if ($current_stream?.id === channel.id) $current_stream = null;
+		else {
+			$current_stream = channel;
+			toggle_mute(channel);
+		}
+	}
+</script>
+
+<svelte:head>
+	<title>Multi-view</title>
+	<meta name="description" content="Multi-view" />
+</svelte:head>
+
+<section class="flex h-full w-full items-center justify-center">
+	<div
+		class={cls(
+			'grid h-full w-full',
+			$channels.length > 0 ? 'grid-cols-12' : 'place-content-center'
+		)}
+	>
+		{#if $channels.length > 0}
+			{#each $channels as channel (channel.id)}
+				{@const i = vIndex.get(channel.id) ?? -1}
+				<div
+					style:order={$channels_order.indexOf(channel.id)}
+					class={cls(
+						channel.hidden || ($current_stream && $current_stream.id !== channel.id)
+							? 'hidden'
+							: 'block',
+						'relative',
+						$current_stream?.id === channel.id && 'col-span-full'
+					)}
+					class:col-span-12={(vLen === 3 && i === 0) ||
+						vLen === 2 ||
+						(vLen === 1 && !$current_stream)}
+					class:col-span-6={(vLen === 3 && i >= 1) ||
+						(vLen === 5 && (i === 0 || i === 1)) ||
+						(vLen === 4 && !$current_stream)}
+					class:col-span-4={(vLen === 5 && i > 1) ||
+						vLen === 6 ||
+						(vLen === 7 && i < 3) ||
+						(vLen === 9 && !$current_stream)}
+					class:col-span-3={(vLen === 7 && i > 2) || (vLen === 8 && !$current_stream)}
+					animate:flip={{ duration: 150 }}
+				>
+					{#if $settings.controls}
+						<div
+							class="absolute bottom-4 left-1/2 flex -translate-x-1/2 transform items-center gap-1 rounded-full bg-zinc-800 p-[2px]"
+						>
+							<div
+								role="button"
+								tabindex="0"
+								onkeydown={(e) => handle_keydown(e, () => set_stream(channel))}
+								onclick={() => set_stream(channel)}
+								class:text-zinc-400={!channel.hidden}
+								class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-zinc-700 py-1 duration-300 hover:bg-zinc-600"
+							>
+								<i
+									class:text-yellow-300={$current_stream?.id === channel.id}
+									class="fa-solid fa-star cursor-pointer text-sm"
+								></i>
+							</div>
+							<div
+								role="button"
+								tabindex="0"
+								onkeydown={(e) => handle_keydown(e, () => toggle_hidden(channel))}
+								onclick={() => toggle_hidden(channel)}
+								class:text-zinc-400={!channel.hidden}
+								class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-zinc-700 py-1 duration-300 hover:bg-zinc-600"
+							>
+								<i class="fa-solid fa-eye-slash cursor-pointer text-sm"></i>
+							</div>
+							<div
+								role="button"
+								tabindex="0"
+								onkeydown={(e) => handle_keydown(e, () => toggle_mute(channel))}
+								onclick={() => toggle_mute(channel)}
+								class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-zinc-700 py-1 duration-300 hover:bg-zinc-600"
+								class:text-zinc-400={channel.muted}
+								class:text-danger={!channel.muted}
+							>
+								<i class="fa-solid fa-volume cursor-pointer text-sm"></i>
+							</div>
+							<VodsClips handle={channel.handle} supabase={data.supabase} />
+						</div>
+					{/if}
+
+					<TwitchEmbed render_source={$render_source} {channel} initialMuted={channel.muted} />
+				</div>
+			{/each}
+		{:else}
+			<div
+				role="button"
+				tabindex="0"
+				onclick={() => stream_manager_open.set(true)}
+				onkeydown={(e) => {
+					handle_keydown(e, () => stream_manager_open.set(true));
+				}}
+				class="cursor-pointer items-center justify-center rounded-lg bg-zinc-800 px-3 py-1 duration-300 hover:bg-zinc-700"
+			>
+				<i class="fa-solid fa-plus mt-[5px] text-gray-400"></i>
+			</div>
+		{/if}
+	</div>
+</section> -->

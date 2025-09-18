@@ -1,10 +1,9 @@
 import { createServerClient } from '@supabase/ssr'
 import { type Handle, redirect } from '@sveltejs/kit'
 import { sequence } from '@sveltejs/kit/hooks'
-
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
 
-const supabase: Handle = async ({ event, resolve }) => {
+const supabase_handle: Handle = async ({ event, resolve }) => {
   event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
     cookies: {
       getAll: () => event.cookies.getAll(),
@@ -12,50 +11,36 @@ const supabase: Handle = async ({ event, resolve }) => {
         cookiesToSet.forEach(({ name, value, options }) => {
           event.cookies.set(name, value, { ...options, path: '/' })
         })
-      },
-    },
+      }
+    }
   })
 
-  event.locals.safeGetSession = async () => {
-    const {
-      data: { session },
-    } = await event.locals.supabase.auth.getSession()
-    if (!session) {
-      return { session: null, user: null }
-    }
-
-    const {
-      data: { user },
-      error,
-    } = await event.locals.supabase.auth.getUser()
-    if (error) {
-      return { session: null, user: null }
-    }
-
-    return { session, user }
+  event.locals.getSession = async () => {
+    const { data: { session } } = await event.locals.supabase.auth.getSession()
+    return session ?? null
   }
 
   return resolve(event, {
     filterSerializedResponseHeaders(name) {
       return name === 'content-range' || name === 'x-supabase-api-version'
-    },
+    }
   })
 }
 
-const authGuard: Handle = async ({ event, resolve }) => {
-  const { session, user } = await event.locals.safeGetSession()
-  event.locals.session = session
-  event.locals.user = user
+const auth_guard: Handle = async ({ event, resolve }) => {
+  const pathname = event.url.pathname
+  const needsAuth = pathname.startsWith('/organize')
 
-  if (!event.locals.session && event.url.pathname.startsWith('/private')) {
-    redirect(303, '/auth')
-  }
-
-  if (event.locals.session && event.url.pathname === '/auth') {
-    redirect(303, '/private')
+  if (needsAuth) {
+    const session = await event.locals.getSession()
+    event.locals.session = session
+    event.locals.user = session?.user ?? null
+  } else {
+    event.locals.session = null
+    event.locals.user = null
   }
 
   return resolve(event)
 }
 
-export const handle: Handle = sequence(supabase, authGuard)
+export const handle: Handle = sequence(supabase_handle, auth_guard)

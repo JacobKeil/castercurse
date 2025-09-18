@@ -1,7 +1,7 @@
 import { db } from '$lib/server/database'
 import type { PageServerLoad } from './$types'
 
-export const load: PageServerLoad = async ({ locals: { session }, cookies, params }) => {
+export const load: PageServerLoad = async ({ cookies, params }) => {
   const event = await db.event.findFirst({
     where: {
       id: params.id
@@ -26,7 +26,6 @@ export const load: PageServerLoad = async ({ locals: { session }, cookies, param
   })
 
   return {
-    session,
     cookies: cookies.getAll(),
     event
   }

@@ -13,3 +13,4 @@ export { default as Event } from './Event.svelte';
 export { default as CookieNotice } from './CookieNotice.svelte';
 
 export * from './basic';
+export * from './forms';

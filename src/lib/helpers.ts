@@ -9,6 +9,19 @@ export function handle_keydown(e: KeyboardEvent, func: () => void) {
   }
 }
 
+export async function fetch_api(path: string): Promise<any> {
+  let response = await fetch(
+   `${PUBLIC_ORIGIN}/api${path}`
+  );
+  let result = await response.json();
+  return result;
+}
+
+export async function fetch_exteral_api(path: string): Promise<any> {
+  let response = await fetch(path);
+  let result = await response.json();
+  return result;
+}
 
 export async function fetch_live_data() {
   const event = get(current_event);

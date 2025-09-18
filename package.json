@@ -62,6 +62,8 @@
 		"postgres": "^3.4.7",
 		"sortablejs": "^1.15.6",
 		"svelte-dnd-action": "^0.9.64",
-		"svelte-ux": "^1.0.6"
+		"svelte-ux": "^1.0.6",
+		"swapy": "^1.0.5",
+		"zod": "^4.0.17"
 	}
 }

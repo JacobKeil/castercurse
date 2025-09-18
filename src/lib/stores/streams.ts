@@ -5,6 +5,8 @@ export const MAX_CHANNELS = 9;
 export const MAX_LAYOUTS = 3;
 
 export const channels = writable<Channel[]>([]);
+export const layout = writable<number>(0);
+export const channels_order = writable<string[]>([]);
 
 export const render_source = writable<boolean>(false);
 export const current_stream = writable<Channel | null>(null);
@@ -92,7 +94,6 @@ export function unhide_all() {
   })
   channels.set(chs);
 }
-
 
 current_stream_in_list.subscribe(is_still_there => {
   if (!is_still_there) {
