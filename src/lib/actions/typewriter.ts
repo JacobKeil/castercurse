@@ -7,7 +7,7 @@ let phrases = [
     'All your favorite streamers in one location.',
     'Make customized views.',
     'Host events for your community.',
-    'View realtime data on your event.',
+    'Quickly view VODs and Clips.',
     'Never miss an important moment.'
 ];
 
