@@ -1,22 +1,20 @@
 <script lang="ts">
 	import moment from 'moment';
+	import { TwitchVod } from '$lib';
 	import { Dialog, ProgressCircle } from 'svelte-ux';
 	import { writable } from 'svelte/store';
 	import { channels, render_source } from '$lib/stores/streams';
 	import { onMount } from 'svelte';
-	import TwitchVod from './TwitchVod.svelte';
-	import type { SupabaseClient } from '@supabase/supabase-js';
 	import { handle_keydown } from '$lib/helpers';
 	import { PUBLIC_ORIGIN } from '$env/static/public';
+	import { supabase } from '$lib/supabase_client';
 
 	let {
 		small_icon = false,
-		handle,
-		supabase
+		handle
 	}: {
 		small_icon?: boolean;
 		handle: string;
-		supabase: SupabaseClient<any, 'public', any>;
 	} = $props();
 
 	let open: boolean = $state(false);
@@ -210,10 +208,17 @@
 
 <Dialog
 	bind:open={video_open}
-	classes={{ backdrop: 'bg-zinc-900/70' }}
+	classes={{ backdrop: 'bg-zinc-900/70', root: 'border-0', dialog: 'border-0' }}
 	class="h-full max-h-[calc(100vh_-_30%)] w-full max-w-[calc(100vw_-_2rem)] p-2 mobile:max-w-[calc(100vw_-_30%)]"
 >
 	{#if video_open && $current_vod}
-		<TwitchVod vod_id={$current_vod} render_source={$render_source} />
+		<TwitchVod
+			close={() => {
+				video_open = false;
+				current_vod.set(null);
+			}}
+			vod_id={$current_vod}
+			render_source={$render_source}
+		/>
 	{/if}
 </Dialog>

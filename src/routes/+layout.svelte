@@ -20,17 +20,37 @@
 	import { handle_keydown } from '$lib/helpers';
 	import { Button, Toggle, Avatar, Menu, MenuItem, Drawer, Dialog } from 'svelte-ux';
 	import { PUBLIC_ORIGIN } from '$env/static/public';
+	import { supabase } from '$lib/supabase_client';
+	import type { Session } from '@supabase/supabase-js';
 
 	let { children, data } = $props();
-	const { supabase, user } = data;
+	let session = $state<Session | null>(null);
+	let user = $derived(session?.user ?? null);
 
 	let cookie_notice_shown: boolean = $state(false);
 	let browser: string | null = $state(null);
-	let home_screen = $derived(page.url.pathname === '/' || page.url.pathname === '/events');
+	let home_screen = $derived(
+		page.url.pathname === '/' ||
+			page.url.pathname === '/events' ||
+			page.url.pathname.includes('/organize')
+	);
 	let view_screen = $derived(
 		page.url.pathname.includes('view') ||
 			(page.url.pathname.includes('events') && page.url.pathname !== '/events')
 	);
+
+	onMount(() => {
+		// keep session in sync without calling /auth/v1/user
+		supabase.auth.getSession().then(({ data }) => {
+			session = data.session ?? null;
+		});
+		const {
+			data: { subscription }
+		} = supabase.auth.onAuthStateChange((_evt, s) => {
+			session = s;
+		});
+		return () => subscription.unsubscribe();
+	});
 
 	onMount(() => {
 		if (localStorage.getItem('theme') !== 'dark') {
@@ -43,15 +63,8 @@
 		let cookies_notice_store = localStorage.getItem('cookie_notice');
 		browser = window.navigator.userAgent;
 
-		if (!settings_store) {
-			localStorage.setItem('settings', JSON.stringify(default_settings));
-		}
-
-		if (!cookies_notice_store) {
-			cookie_notice_shown = true;
-		} else {
-			cookie_notice_shown = false;
-		}
+		if (!settings_store) localStorage.setItem('settings', JSON.stringify(default_settings));
+		cookie_notice_shown = !cookies_notice_store;
 
 		$settings = settings_store ? JSON.parse(settings_store) : default_settings;
 
@@ -60,23 +73,59 @@
 				if (!$channels[parseInt(e.key) - 1]) return;
 				set_stream($channels[parseInt(e.key) - 1]);
 			}
-			if (e.key === 'Escape' && !$stream_manager_open) {
-				current_stream.set(null);
-			}
-			// if (e.key === 'c') {
-			// 	settings.set({
-			// 		...$settings,
-			// 		open_chat: !$settings.open_chat
-			// 	})
-			// 	localStorage.setItem('settings', JSON.stringify($settings));
-			// }
+			if (e.key === 'Escape' && !$stream_manager_open) current_stream.set(null);
 		});
 
-		window.onbeforeunload = function () {
-			const current_page = window.location.href;
-			localStorage.setItem('last_page', current_page);
+		window.onbeforeunload = () => {
+			localStorage.setItem('last_page', window.location.href);
 		};
 	});
+
+	// onMount(() => {
+	// 	if (localStorage.getItem('theme') !== 'dark') {
+	// 		localStorage.setItem('theme', 'dark');
+	// 		location.reload();
+	// 	}
+
+	// 	$render_source = localStorage.getItem('render_source') === 'true';
+	// 	let settings_store = localStorage.getItem('settings');
+	// 	let cookies_notice_store = localStorage.getItem('cookie_notice');
+	// 	browser = window.navigator.userAgent;
+
+	// 	if (!settings_store) {
+	// 		localStorage.setItem('settings', JSON.stringify(default_settings));
+	// 	}
+
+	// 	if (!cookies_notice_store) {
+	// 		cookie_notice_shown = true;
+	// 	} else {
+	// 		cookie_notice_shown = false;
+	// 	}
+
+	// 	$settings = settings_store ? JSON.parse(settings_store) : default_settings;
+
+	// 	document.addEventListener('keyup', (e) => {
+	// 		if (parseInt(e.key) >= 1 && parseInt(e.key) <= 9 && !$stream_manager_open) {
+	// 			if (!$channels[parseInt(e.key) - 1]) return;
+	// 			set_stream($channels[parseInt(e.key) - 1]);
+	// 		}
+	// 		if (e.key === 'Escape' && !$stream_manager_open) {
+	// 			current_stream.set(null);
+	// 		}
+	// 		// if (e.key === 'c') {
+	// 		// 	settings.set({
+	// 		// 		...$settings,
+	// 		// 		open_chat: !$settings.open_chat
+	// 		// 	})
+	// 		// 	localStorage.setItem('settings', JSON.stringify($settings));
+	// 		// }
+	// 	});
+
+	// 	window.onbeforeunload = function () {
+	// 		const current_page = window.location.href;
+	// 		localStorage.setItem('last_page', current_page);
+	// 	};
+	// });
 
 	$effect(() => {
 		const params = new URLSearchParams(window.location.search);
@@ -117,7 +166,7 @@
 <section class="flex flex-col" class:flex-col-reverse={!$settings.sidebar_top}>
 	<div class="flex h-[50px] items-center justify-between border-b border-zinc-800 bg-zinc-900 px-4">
 		<div class="flex items-center gap-1 overflow-hidden">
-			<div class="min-w-9 pr-2">
+			<div class="min-w-7 pr-2">
 				<Logo />
 			</div>
 			{#if view_screen}
@@ -148,7 +197,11 @@
 						tabindex="0"
 						class="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2 hover:bg-zinc-700"
 						onclick={() => stream_manager_open.set(true)}
-						onkeydown={() => stream_manager_open.set(true)}
+						onkeydown={(e) => {
+							handle_keydown(e, () => {
+								stream_manager_open.set(true);
+							});
+						}}
 					>
 						<i class="fa-solid fa-arrow-left-from-line fa-md text-gray-400"></i>
 					</div>
@@ -167,12 +220,23 @@
 								{open}
 								on:close={toggleOff}
 								matchWidth
-								classes={{ root: 'text-gray-400 min-w-[100px]' }}
+								classes={{ root: 'bg-zinc-800 text-gray-400 min-w-[150px]' }}
+								transitionParams={{ duration: 200 }}
+								offset={12}
 							>
-								<MenuItem classes={{ root: 'text-sm' }}><a href="/">Home</a></MenuItem>
-								<MenuItem classes={{ root: 'text-sm' }}><a href="/events">Events</a></MenuItem>
-								<MenuItem classes={{ root: 'text-red-400 text-sm' }} on:click={logout}
-									>Logout</MenuItem
+								<MenuItem classes={{ root: 'text-sm text-red-400 border-b border-dashed' }}>
+									{user?.user_metadata.nickname}
+								</MenuItem>
+								<MenuItem classes={{ root: 'text-sm py-1' }}><a href="/">Home</a></MenuItem>
+								<MenuItem classes={{ root: 'text-sm py-1' }}><a href="/events">Events</a></MenuItem>
+								<!-- <MenuItem classes={{ root: 'text-sm py-1' }}
+									><a href="/organize">Organize Events</a></MenuItem
+								> -->
+								<MenuItem
+									classes={{
+										root: 'text-sm border-t border-dashed italic'
+									}}
+									on:click={logout}>Logout</MenuItem
 								>
 							</Menu>
 						</Button>
@@ -214,7 +278,7 @@
 		$settings.sidebar_top ? 'mt-[50px] h-[calc(100vh_-_50px)]' : 'h-[calc(100vh_-_50px)]'
 	)}
 >
-	<StreamManager {supabase} />
+	<StreamManager />
 </Drawer>
 
 <Dialog

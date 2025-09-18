@@ -6,10 +6,7 @@
 	import { uniqueId } from '@layerstack/utils';
 	import type { Channel } from '@prisma/client';
 
-	let {
-		broadcast = null,
-		supabase
-	}: { broadcast: Channel | null; supabase: SupabaseClient<any, 'public', any> } = $props();
+	let { broadcast = null }: { broadcast: Channel | null } = $props();
 
 	function is_checked(e: Event) {
 		return (e.target as HTMLInputElement).checked;
@@ -28,7 +25,7 @@
 		</div>
 		<div class="flex items-center gap-2">
 			{#if broadcast?.handle}
-				<VodsClips handle={broadcast.handle} {supabase} small_icon />
+				<VodsClips handle={broadcast.handle} small_icon />
 			{/if}
 			<Switch
 				size="md"
