@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { handle_keydown } from '$lib/helpers';
 	import { onMount } from 'svelte';
 
 	let {
@@ -6,13 +7,15 @@
 		render_source = false,
 		vod_id,
 		width = '100%',
-		height = '100%'
+		height = '100%',
+		close
 	}: {
 		initial_volume?: number;
 		render_source?: boolean;
 		vod_id: string;
 		width?: string;
 		height?: string;
+		close: () => void;
 	} = $props();
 
 	let parent: string[] = [];
@@ -80,4 +83,18 @@
 	});
 </script>
 
-<div class="h-full w-full" id="player" bind:this={playerDiv}></div>
+<div class="relative h-full w-full" id="player" bind:this={playerDiv}>
+	<div
+		role="button"
+		tabindex="0"
+		onclick={close}
+		onkeydown={(e) => {
+			handle_keydown(e, () => {
+				close();
+			});
+		}}
+		class="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800"
+	>
+		<i class="fa-solid fa-xmark fa-lg cursor-pointer text-gray-500 group-hover:text-gray-400"></i>
+	</div>
+</div>

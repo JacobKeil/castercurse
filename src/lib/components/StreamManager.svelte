@@ -11,24 +11,30 @@
 	import { onMount } from 'svelte';
 	import { fly, slide } from 'svelte/transition';
 	import { page } from '$app/state';
-	import type { SupabaseClient, UserResponse } from '@supabase/supabase-js';
 	import moment from 'moment';
 	import { current_event } from '$lib/stores/event';
 	import { fetch_live_data, handle_keydown } from '$lib/helpers';
+	import { supabase } from '$lib/supabase_client';
 
-	let auth_response: UserResponse;
 	let is_logged_in: boolean = $state(false);
 
 	let toggle_source = () => {};
 	let copy_url = () => {};
 	let copied_link = false;
 
-	let { supabase }: { supabase: SupabaseClient<any, 'public', any>; } = $props();
+	onMount(() => {
+		supabase.auth.getSession().then(({ data }) => {
+			is_logged_in = !!data.session;
+		});
+		const {
+			data: { subscription }
+		} = supabase.auth.onAuthStateChange((_evt, s) => {
+			is_logged_in = !!s;
+		});
+		return () => subscription.unsubscribe();
+	});
 
-	onMount(async () => {
-		auth_response = await supabase.auth.getUser();
-    is_logged_in = !!auth_response.data.user;
-		
+	onMount(() => {
 		toggle_source = () => {
 			localStorage.setItem('render_source', String(!$render_source));
 			$render_source = !$render_source;
@@ -38,12 +44,10 @@
 		copy_url = () => {
 			copied_link = true;
 			navigator.clipboard.writeText(page.url.href);
-			setTimeout(() => {
-				copied_link = false;
-			}, 5000);
+			setTimeout(() => (copied_link = false), 5000);
 		};
 	});
-	
+
 	function set_source_all() {
 		if ($render_source) {
 			$channels.forEach((ch) => {
@@ -59,12 +63,12 @@
 			});
 		}
 	}
-	
+
 	$effect(() => {
-		if ($stream_manager_open && $current_event) {
-			fetch_live_data()
+		if ($stream_manager_open && page.url.pathname.includes('/events')) {
+			fetch_live_data();
 		}
-	})
+	});
 </script>
 
 <div class="flex items-center justify-between p-4">
@@ -103,7 +107,9 @@
 				stream_manager_open.set(false);
 			});
 		}}
-		onclick={() => { stream_manager_open.set(false); }}
+		onclick={() => {
+			stream_manager_open.set(false);
+		}}
 		class="group cursor-pointer rounded-full bg-zinc-800 px-2 py-1 hover:bg-zinc-700"
 	>
 		<i class="fa-solid fa-xmark fa-lg cursor-pointer text-gray-500 group-hover:text-gray-400"></i>
@@ -144,7 +150,7 @@
 			<div class="space-y-2">
 				<h1 class="text-lg font-medium text-gray-400">Main Broadcast</h1>
 				{#if $current_event?.main_broadcast}
-					<Broadcast broadcast={$current_event?.main_broadcast} {supabase} />
+					<Broadcast broadcast={$current_event?.main_broadcast} />
 				{:else}
 					<p class="text-gray-500">No main broadcast added to this event.</p>
 				{/if}
@@ -154,7 +160,7 @@
 				{#if $current_event?.watch_parties}
 					<section class="grid grid-cols-2 gap-2">
 						{#each $current_event?.watch_parties as wp}
-							<Broadcast broadcast={wp} {supabase} />
+							<Broadcast broadcast={wp} />
 						{/each}
 					</section>
 				{:else}
@@ -204,10 +210,12 @@
 							tabindex="0"
 							onkeydown={(e) => {
 								handle_keydown(e, () => {
-									toggle_hidden(channel)
+									toggle_hidden(channel);
 								});
 							}}
-							onclick={() => { toggle_hidden(channel) }}
+							onclick={() => {
+								toggle_hidden(channel);
+							}}
 						>
 							<i
 								class="fa-solid fa-eye fa-sm cursor-pointer"
@@ -245,7 +253,7 @@
 				<div class="grid grid-cols-1 gap-2 tablet:grid-cols-3">
 					{#if $current_event}
 						{#each $current_event.teams as team}
-							<TeamSection {supabase} {team} show_live_status={is_logged_in} />
+							<TeamSection {team} show_live_status={is_logged_in} />
 						{/each}
 					{:else}
 						<p class="text-gray-500">No teams added to this event.</p>

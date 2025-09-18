@@ -6,8 +6,8 @@
 	import { uniqueId } from '@layerstack/utils';
 	import type { TeamWithChannelsLive } from '$lib/types';
 
-	let { team, supabase, show_live_status }: 
-	{ team: TeamWithChannelsLive; supabase: SupabaseClient<any, 'public', any>; show_live_status: boolean } = $props();
+	let { team, show_live_status }: { team: TeamWithChannelsLive; show_live_status: boolean } =
+		$props();
 
 	function is_checked(e: Event) {
 		return (e.target as HTMLInputElement).checked;
@@ -28,10 +28,10 @@
 					<div class="flex items-center gap-2">
 						{#if show_live_status}
 							<div
-							class="h-2 w-2 rounded-full"
-							class:bg-green-500={player.is_live}
-							class:bg-red-500={!player.is_live}
-						></div>
+								class="h-2 w-2 rounded-full"
+								class:bg-green-500={player.is_live}
+								class:bg-red-500={!player.is_live}
+							></div>
 						{/if}
 						<h1
 							class:text-gray-500={!$channels.some((ch) => ch.handle === player.handle)}
@@ -41,7 +41,7 @@
 						</h1>
 					</div>
 					<div class="flex items-center gap-2">
-						<VodsClips handle={player.handle} {supabase} small_icon />
+						<VodsClips handle={player.handle} small_icon />
 						<Switch
 							size="md"
 							color="danger"
