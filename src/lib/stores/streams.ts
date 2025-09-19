@@ -121,6 +121,17 @@ export function unhide_all() {
 	channels.set(chs);
 }
 
+export function set_stream(channel: Channel) {
+	let curr_stream = get(current_stream);
+	if (curr_stream && curr_stream.id === channel.id) {
+		current_stream.set(null);
+	} else {
+		current_stream.set(channel);
+		un_mute(channel);
+		un_pause(channel);
+	}
+}
+
 current_stream_in_list.subscribe((is_still_there) => {
 	if (!is_still_there) {
 		current_stream.set(null);

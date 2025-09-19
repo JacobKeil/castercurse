@@ -4,25 +4,13 @@
 	import {
 		channels,
 		current_stream,
+		set_stream,
 		toggle_hidden,
 		toggle_mute,
-		toggle_pause,
-		un_mute,
-		un_pause
+		toggle_pause
 	} from '$lib/stores/streams';
-	import type { Channel } from '$lib/types';
 	import { cls } from '@layerstack/tailwind';
 	import { flip } from 'svelte/animate';
-
-	function set_stream(channel: Channel) {
-		if ($current_stream && $current_stream.id === channel.id) {
-			$current_stream = null;
-		} else {
-			$current_stream = channel;
-			un_mute(channel);
-			un_pause(channel);
-		}
-	}
 </script>
 
 <div class="flex items-center gap-[5px]">
