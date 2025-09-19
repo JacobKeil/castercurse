@@ -11,6 +11,7 @@ export { default as TeamSection } from './TeamSection.svelte';
 export { default as Broadcast } from './Broadcast.svelte';
 export { default as Event } from './Event.svelte';
 export { default as CookieNotice } from './CookieNotice.svelte';
+export { default as ControlOverlay } from './ControlOverlay.svelte';
 
 export * from './basic';
 export * from './forms';

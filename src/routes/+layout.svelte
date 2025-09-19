@@ -7,13 +7,12 @@
 		current_stream,
 		render_source,
 		channels,
-		toggle_mute,
-		stream_manager_open
+		stream_manager_open,
+		set_stream
 	} from '$lib/stores/streams';
 
 	import { onMount } from 'svelte';
 	import { default_settings, settings } from '$lib/stores/settings';
-	import type { Channel } from '$lib/types';
 	import { page } from '$app/state';
 	import { ChannelTabs, CookieNotice, Logo, StreamManager, ToggleHidden, TwitchChat } from '$lib';
 	import { fly } from 'svelte/transition';
@@ -89,15 +88,6 @@
 			goto(last_page);
 		}
 	});
-
-	function set_stream(channel: Channel) {
-		if ($current_stream && $current_stream.id === channel.id) {
-			$current_stream = null;
-		} else {
-			$current_stream = channel;
-			toggle_mute(channel);
-		}
-	}
 
 	async function sign_in_with_twitch() {
 		const { data, error } = await supabase.auth.signInWithOAuth({
