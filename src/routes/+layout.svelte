@@ -185,9 +185,9 @@
 								</MenuItem>
 								<MenuItem classes={{ root: 'text-sm py-1' }}><a href="/">Home</a></MenuItem>
 								<MenuItem classes={{ root: 'text-sm py-1' }}><a href="/events">Events</a></MenuItem>
-								<MenuItem classes={{ root: 'text-sm py-1' }}
+								<!-- <MenuItem classes={{ root: 'text-sm py-1' }}
 									><a href="/organize">Organize Events</a></MenuItem
-								>
+								> -->
 								<MenuItem
 									classes={{
 										root: 'text-sm border-t border-dashed italic'
