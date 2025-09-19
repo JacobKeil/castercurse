@@ -19,10 +19,12 @@
 					$channels = [
 						...$channels,
 						{
-							id: uniqueId(),
+							id: String(search),
 							handle: String(search),
 							hidden: false,
-							muted: true
+							muted: true,
+							paused: false,
+							volume: 0.3
 						}
 					];
 				}

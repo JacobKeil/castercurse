@@ -5,7 +5,7 @@
 	import { fly } from 'svelte/transition';
 </script>
 
-{#if $channels.length > 0 && $channels.filter((c) => c.hidden).length > 0}
+{#if $channels.length > 0 && $channels.filter((c) => c.hidden || c.paused).length > 0}
 	<div
 		in:fly={{ duration: 100, x: 100 }}
 		role="button"
@@ -22,6 +22,6 @@
 			'flex h-full cursor-pointer select-none items-center gap-2 rounded-lg bg-zinc-800 px-3 py-1 text-gray-500 duration-200 hover:bg-zinc-700'
 		)}
 	>
-		UNHIDE ALL
+		UNHIDE / UNPAUSE ALL
 	</div>
 {/if}

@@ -103,10 +103,12 @@
 					$channels = [
 						...$channels,
 						{
-							id: uniqueId(),
+							id: ch,
 							handle: ch,
 							hidden: false,
-							muted: true
+							muted: true,
+							paused: false,
+							volume: 0.3
 						}
 					];
 				});
@@ -228,7 +230,13 @@
 							<VodsClips handle={channel.handle} />
 						</div>
 					{/if}
-					<TwitchEmbed render_source={$render_source} {channel} initialMuted={channel.muted} />
+					<TwitchEmbed
+						render_source={$render_source}
+						{channel}
+						initial_muted={channel.muted}
+						initial_volume={channel.volume}
+						initial_paused={channel.paused}
+					/>
 				</div>
 			{/each}
 			{#if $channels.every((ch) => ch.hidden)}

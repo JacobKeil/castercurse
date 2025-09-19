@@ -9,18 +9,21 @@
 		channel,
 		width = '100%',
 		height = '100%',
-		initialMuted = true
+		initial_muted = true,
+		initial_paused = false
 	}: {
 		initial_volume?: number;
 		render_source: boolean;
 		channel: Channel;
 		width?: string;
 		height?: string;
-		initialMuted: boolean;
+		initial_muted: boolean;
+		initial_paused: boolean;
 	} = $props();
 
 	let parent: string[] = [];
-	let muted = initialMuted;
+	let muted = initial_muted;
+	let paused = initial_paused;
 
 	let playerDiv: HTMLDivElement;
 	let player: any;
@@ -56,10 +59,12 @@
 	}
 
 	function pause() {
+		paused = true;
 		player.pause();
 	}
 
 	function play() {
+		paused = false;
 		player.play();
 	}
 
@@ -171,6 +176,7 @@
 				channels.push({
 					...channel,
 					muted,
+					paused,
 					mute,
 					un_mute,
 					get_volume,
