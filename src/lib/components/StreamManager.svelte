@@ -251,7 +251,7 @@
 			<div class="space-y-2">
 				<h1 class="text-lg font-medium text-gray-400">Teams</h1>
 				<div class="grid grid-cols-1 gap-2 tablet:grid-cols-3">
-					{#if $current_event}
+					{#if $current_event && $current_event.teams.length > 0}
 						{#each $current_event.teams as team}
 							<TeamSection {team} show_live_status={is_logged_in} />
 						{/each}
