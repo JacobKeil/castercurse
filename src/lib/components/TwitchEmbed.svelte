@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { channels } from '$lib/stores/streams';
 	import type { Channel } from '$lib/types';
 
@@ -73,11 +73,10 @@
 	}
 
 	function set_volume(value: number) {
-		if (value >= 0 && value <= 1.0) {
-			player.setVolume(value);
-		} else {
-			player.setVolume(0.5);
-		}
+		const v = value >= 0 && value <= 1 ? value : 0.5;
+		player?.setVolume(v);
+
+		channels.update((chs) => chs.map((c) => (c.id === channel.id ? { ...c, volume: v } : c)));
 	}
 
 	function get_quality(): string {
@@ -90,6 +89,15 @@
 
 	function ended(): boolean {
 		return player.getEnded();
+	}
+
+	function snapshot_volume() {
+		try {
+			const v = player?.getVolume?.();
+			if (typeof v === 'number') {
+				channels.update((chs) => chs.map((c) => (c.id === channel.id ? { ...c, volume: v } : c)));
+			}
+		} catch {}
 	}
 
 	function initialize_player() {
@@ -196,6 +204,10 @@
 		if (player) {
 			player.setMuted(muted);
 		}
+	});
+
+	onDestroy(() => {
+		snapshot_volume();
 	});
 </script>
 
