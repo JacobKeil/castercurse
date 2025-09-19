@@ -2,7 +2,7 @@
 import type { LayoutLoad } from './$types';
 
 export const load: LayoutLoad = async ({ data }) => {
-  return { session: data.session };
+	return { session: data.session };
 };
 // export const load: LayoutLoad = async ({ data, depends, fetch }) => {
 //   depends('supabase:auth')
@@ -22,8 +22,8 @@ export const load: LayoutLoad = async ({ data }) => {
 //             return data.cookies
 //           },
 //         },
-//       })  
-      
+//       })
+
 //   const {
 //     data: { session },
 //   } = await supabase.auth.getSession()
@@ -31,6 +31,6 @@ export const load: LayoutLoad = async ({ data }) => {
 //   const {
 //     data: { user },
 //   } = await supabase.auth.getUser()
-  
+
 //   return { supabase, session, user }
 // }

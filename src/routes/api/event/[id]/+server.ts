@@ -2,10 +2,8 @@
 import { json } from '@sveltejs/kit';
 
 export async function GET({ request, url }) {
-  return json({
-    teams: [
-      
-    ],
-    picked_channels: ["playapex"]
-  });
+	return json({
+		teams: [],
+		picked_channels: ['playapex']
+	});
 }

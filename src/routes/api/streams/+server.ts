@@ -2,8 +2,8 @@ import { json } from '@sveltejs/kit';
 import { make_twitch_api_request } from '$lib/server/twitch'; // Import the snake_case helper
 
 export async function GET({ request, cookies }) {
-  // const access_token = cookies.get('oauth_provider_token'); 
-  // if (access_token) throw Error("No Auth");
+	// const access_token = cookies.get('oauth_provider_token');
+	// if (access_token) throw Error("No Auth");
 
 	const twitch_api_base_url = 'https://api.twitch.tv/helix/streams';
 

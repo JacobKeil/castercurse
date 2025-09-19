@@ -4,7 +4,7 @@ name: Build and Deploy SvelteKit App
 
 on:
   push:
-    branches: [ "main" ] # Runs when you push to the main branch
+    branches: ['main'] # Runs when you push to the main branch
 
 env:
   # IMPORTANT: Change this to your Docker Hub username and image name

@@ -1,8 +1,8 @@
 import { json } from '@sveltejs/kit';
-import { make_twitch_api_request } from '$lib/server/twitch'
+import { make_twitch_api_request } from '$lib/server/twitch';
 
 export async function GET({ url, cookies }) {
-  const search = url.searchParams.get('search');
+	const search = url.searchParams.get('search');
 	const final_twitch_url = `https://api.twitch.tv/helix/search/channels?query=` + search;
 
 	try {

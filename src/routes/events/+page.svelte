@@ -13,11 +13,9 @@
 		<h1 class="text-2xl font-medium text-zinc-300">Ongoing Events</h1>
 		{#if data.live_events.length > 0}
 			<div class="grid grid-cols-1 mobile:grid-cols-2 tablet:grid-cols-3">
-				<div class="grid grid-cols-1 mobile:grid-cols-2 tablet:grid-cols-3">
-					{#each data.live_events as event}
-						<Event {event} is_live />
-					{/each}
-				</div>
+				{#each data.live_events as event}
+					<Event {event} is_live />
+				{/each}
 			</div>
 		{:else}
 			<div class="flex h-72 w-full items-center justify-center rounded-lg bg-zinc-800/30">

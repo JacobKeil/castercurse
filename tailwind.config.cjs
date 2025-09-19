@@ -9,7 +9,7 @@ export default {
 		dark: {
 			primary: '#FF6467',
 			accent: '#FF6467'
-		},
+		}
 	},
 	content: [
 		'./src/**/*.{html,js,svelte,ts}',
@@ -47,4 +47,4 @@ export default {
 		extend: {}
 	},
 	plugins: [layerstack]
-}
+};

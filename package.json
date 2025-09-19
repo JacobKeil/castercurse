@@ -51,6 +51,7 @@
 		"@layerstack/svelte-stores": "^1.0.1",
 		"@layerstack/tailwind": "^1.0.0",
 		"@layerstack/utils": "^1.0.0",
+		"@neodrag/svelte": "^2.3.3",
 		"@prisma/client": "^6.11.0",
 		"@supabase/ssr": "^0.6.1",
 		"@supabase/supabase-js": "^2.50.2",

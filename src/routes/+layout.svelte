@@ -40,7 +40,6 @@
 	);
 
 	onMount(() => {
-		// keep session in sync without calling /auth/v1/user
 		supabase.auth.getSession().then(({ data }) => {
 			session = data.session ?? null;
 		});
@@ -80,52 +79,6 @@
 			localStorage.setItem('last_page', window.location.href);
 		};
 	});
-
-	// onMount(() => {
-	// 	if (localStorage.getItem('theme') !== 'dark') {
-	// 		localStorage.setItem('theme', 'dark');
-	// 		location.reload();
-	// 	}
-
-	// 	$render_source = localStorage.getItem('render_source') === 'true';
-	// 	let settings_store = localStorage.getItem('settings');
-	// 	let cookies_notice_store = localStorage.getItem('cookie_notice');
-	// 	browser = window.navigator.userAgent;
-
-	// 	if (!settings_store) {
-	// 		localStorage.setItem('settings', JSON.stringify(default_settings));
-	// 	}
-
-	// 	if (!cookies_notice_store) {
-	// 		cookie_notice_shown = true;
-	// 	} else {
-	// 		cookie_notice_shown = false;
-	// 	}
-
-	// 	$settings = settings_store ? JSON.parse(settings_store) : default_settings;
-
-	// 	document.addEventListener('keyup', (e) => {
-	// 		if (parseInt(e.key) >= 1 && parseInt(e.key) <= 9 && !$stream_manager_open) {
-	// 			if (!$channels[parseInt(e.key) - 1]) return;
-	// 			set_stream($channels[parseInt(e.key) - 1]);
-	// 		}
-	// 		if (e.key === 'Escape' && !$stream_manager_open) {
-	// 			current_stream.set(null);
-	// 		}
-	// 		// if (e.key === 'c') {
-	// 		// 	settings.set({
-	// 		// 		...$settings,
-	// 		// 		open_chat: !$settings.open_chat
-	// 		// 	})
-	// 		// 	localStorage.setItem('settings', JSON.stringify($settings));
-	// 		// }
-	// 	});
-
-	// 	window.onbeforeunload = function () {
-	// 		const current_page = window.location.href;
-	// 		localStorage.setItem('last_page', current_page);
-	// 	};
-	// });
 
 	$effect(() => {
 		const params = new URLSearchParams(window.location.search);
@@ -188,6 +141,19 @@
 				<ChannelTabs />
 				<ToggleHidden />
 			{/if}
+			{#if home_screen}
+				<div class="flex items-center justify-center divide-x text-zinc-400">
+					<a href="/" class="cursor-pointer px-3 duration-200 hover:text-red-400">Home</a>
+					<a href="/view" class="cursor-pointer px-3 duration-200 hover:text-red-400">Custom View</a
+					>
+					<a href="/events" class="cursor-pointer px-3 duration-200 hover:text-red-400">Events</a>
+					{#if user !== null}
+						<a href="/organize" class="cursor-pointer px-3 duration-200 hover:text-red-400"
+							>Organize Events</a
+						>
+					{/if}
+				</div>
+			{/if}
 		</div>
 		<div class="flex items-center gap-2 pl-3">
 			<div class="flex h-full items-center gap-2">
@@ -229,9 +195,9 @@
 								</MenuItem>
 								<MenuItem classes={{ root: 'text-sm py-1' }}><a href="/">Home</a></MenuItem>
 								<MenuItem classes={{ root: 'text-sm py-1' }}><a href="/events">Events</a></MenuItem>
-								<!-- <MenuItem classes={{ root: 'text-sm py-1' }}
+								<MenuItem classes={{ root: 'text-sm py-1' }}
 									><a href="/organize">Organize Events</a></MenuItem
-								> -->
+								>
 								<MenuItem
 									classes={{
 										root: 'text-sm border-t border-dashed italic'
