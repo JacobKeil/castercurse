@@ -137,11 +137,11 @@
 					<a href="/view" class="cursor-pointer px-3 duration-200 hover:text-red-400">Custom View</a
 					>
 					<a href="/events" class="cursor-pointer px-3 duration-200 hover:text-red-400">Events</a>
-					{#if user !== null}
+					<!-- {#if user !== null}
 						<a href="/organize" class="cursor-pointer px-3 duration-200 hover:text-red-400"
 							>Organize Events</a
 						>
-					{/if}
+					{/if} -->
 				</div>
 			{/if}
 		</div>
