@@ -4,6 +4,7 @@ export { default as AddChannel } from './AddChannel.svelte';
 export { default as StreamManager } from './StreamManager.svelte';
 export { default as ToggleSource } from './ToggleSource.svelte';
 export { default as ToggleHidden } from './ToggleHidden.svelte';
+export { default as ToggleChat } from './ToggleChat.svelte';
 export { default as Settings } from './Settings.svelte';
 export { default as VodsClips } from './VodsClips.svelte';
 export { default as TwitchVod } from './TwitchVod.svelte';
@@ -15,3 +16,4 @@ export { default as ControlOverlay } from './ControlOverlay.svelte';
 
 export * from './basic';
 export * from './forms';
+export * from './sort';

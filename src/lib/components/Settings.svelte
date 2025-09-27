@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { settings } from '$lib/stores/settings';
+	import { settings } from '../stores/settings';
 	import { onMount } from 'svelte';
 	import { Switch } from 'svelte-ux';
 

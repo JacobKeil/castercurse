@@ -1,6 +1,6 @@
 import { PUBLIC_ORIGIN } from '$env/static/public';
 import { get } from 'svelte/store';
-import { current_event } from '$lib/stores/event';
+import { current_event } from './stores/event';
 import type { EventWithChannelsLive } from './types';
 
 export function handle_keydown(e: KeyboardEvent, func: () => void) {

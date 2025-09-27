@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { handle_keydown } from '$lib/helpers';
-	import { onMount } from 'svelte';
+	import { handle_keydown } from '../../helpers';
 
 	let { value = $bindable() }: { value: File | null } = $props();
 

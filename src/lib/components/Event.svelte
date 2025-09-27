@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { handle_keydown } from '$lib/helpers';
+	import { handle_keydown } from '../helpers';
 	import moment from 'moment';
 
 	interface EventType {

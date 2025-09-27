@@ -1,5 +1,4 @@
 import type { EventLink, EventStatus, Prisma, User } from '@prisma/client';
-
 import type { Channel as PrismaChannel } from '@prisma/client';
 
 export type ChannelWithLive = PrismaChannel & {

@@ -2,7 +2,6 @@
 	import '../app.css';
 	import { cls } from '@layerstack/tailwind';
 	import { goto } from '$app/navigation';
-
 	import {
 		current_stream,
 		render_source,
@@ -10,17 +9,24 @@
 		stream_manager_open,
 		set_stream
 	} from '$lib/stores/streams';
-
 	import { onMount } from 'svelte';
 	import { default_settings, settings } from '$lib/stores/settings';
 	import { page } from '$app/state';
-	import { ChannelTabs, CookieNotice, Logo, StreamManager, ToggleHidden, TwitchChat } from '$lib';
+	import {
+		CookieNotice,
+		Sortable,
+		StreamManager,
+		ToggleHidden,
+		ToggleChat,
+		TwitchChat
+	} from '$lib/components';
 	import { fly } from 'svelte/transition';
 	import { handle_keydown } from '$lib/helpers';
 	import { Button, Toggle, Avatar, Menu, MenuItem, Drawer, Dialog } from 'svelte-ux';
 	import { PUBLIC_ORIGIN } from '$env/static/public';
 	import { supabase } from '$lib/supabase_client';
 	import type { Session } from '@supabase/supabase-js';
+	import { Logo } from '$lib/brand';
 
 	let { children, data } = $props();
 	let session = $state<Session | null>(null);
@@ -128,7 +134,10 @@
 				>
 					<i class="fa-solid fa-grid-2 text-red-400"></i>
 				</div>
-				<ChannelTabs />
+				<ToggleChat />
+				<div class="flex items-center gap-[5px]">
+					<Sortable axis="x" variant="tabs" />
+				</div>
 				<ToggleHidden />
 			{/if}
 			{#if home_screen}
@@ -240,7 +249,7 @@
 <Dialog
 	bind:open={cookie_notice_shown}
 	class="m-6 max-h-[calc(50%)] w-full mobile:max-w-[600px]"
-	classes={{ backdrop: 'bg-zinc-800/80' }}
+	classes={{ backdrop: 'bg-white/30' }}
 	persistent
 >
 	<div class="p-2">

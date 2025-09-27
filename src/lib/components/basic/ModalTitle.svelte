@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { handle_keydown } from '$lib/helpers';
+	import { handle_keydown } from '../../helpers';
 	import { Tooltip } from 'svelte-ux';
 
 	let {

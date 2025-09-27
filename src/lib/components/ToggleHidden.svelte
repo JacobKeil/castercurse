@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { handle_keydown } from '$lib/helpers';
-	import { channels, unhide_all } from '$lib/stores/streams';
+	import { handle_keydown } from '../helpers';
+	import { channels, unhide_all } from '../stores/streams';
 	import { cls } from '@layerstack/tailwind';
 	import { fly } from 'svelte/transition';
 </script>
@@ -19,9 +19,9 @@
 			unhide_all();
 		}}
 		class={cls(
-			'flex h-full cursor-pointer select-none items-center gap-2 rounded-lg bg-zinc-800 px-3 py-1 text-gray-500 duration-200 hover:bg-zinc-700'
+			'flex h-full w-fit cursor-pointer select-none items-center gap-2 overflow-hidden rounded-lg bg-zinc-800 px-3 py-1 text-gray-500 duration-200 hover:bg-zinc-700'
 		)}
 	>
-		UNHIDE / UNPAUSE ALL
+		UNHIDE ALL
 	</div>
 {/if}

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { render_source, channels } from '$lib/stores/streams';
+	import { render_source, channels } from '../stores/streams';
 	import { onMount } from 'svelte';
 	import { cls } from '@layerstack/tailwind';
-	import { handle_keydown } from '$lib/helpers';
+	import { handle_keydown } from '../helpers';
 
 	let toggle_source = () => {};
 

@@ -1,10 +1,8 @@
 <script lang="ts">
-	import { channels, MAX_CHANNELS } from '$lib/stores/streams';
+	import { channels, MAX_CHANNELS } from '../stores/streams';
 	import { Switch } from 'svelte-ux';
-	import VodsClips from './VodsClips.svelte';
-	import type { SupabaseClient } from '@supabase/supabase-js';
-	import { uniqueId } from '@layerstack/utils';
-	import type { TeamWithChannelsLive } from '$lib/types';
+	import { VodsClips } from '.';
+	import type { TeamWithChannelsLive } from '../types';
 
 	let { team, show_live_status }: { team: TeamWithChannelsLive; show_live_status: boolean } =
 		$props();
@@ -57,10 +55,12 @@
 											$channels = [
 												...$channels,
 												{
-													id: uniqueId(),
-													handle: String(player.handle),
+													id: player.handle,
+													handle: player.handle,
 													hidden: false,
-													muted: true
+													muted: true,
+													paused: false,
+													volume: 0.3
 												}
 											];
 										}

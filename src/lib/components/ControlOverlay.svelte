@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { handle_keydown } from '$lib/helpers';
+	import { handle_keydown } from '../helpers';
 	import {
 		current_stream,
 		toggle_hidden,
 		toggle_pause,
 		toggle_mute,
 		set_stream
-	} from '$lib/stores/streams';
-	import type { Channel } from '$lib/types';
+	} from '../stores/streams';
+	import type { Channel } from '../types';
 	import { VodsClips } from '.';
 
 	let { channel }: { channel: Channel } = $props();
@@ -51,7 +51,7 @@
 	>
 		<i class="fa-solid fa-eye-slash cursor-pointer text-sm"></i>
 	</div>
-	<div
+	<!-- <div
 		role="button"
 		tabindex="0"
 		onkeydown={(e) => {
@@ -67,7 +67,7 @@
 		class:text-danger={!channel.paused}
 	>
 		<i class="fa-solid fa-play cursor-pointer text-sm"></i>
-	</div>
+	</div> -->
 	<div
 		role="button"
 		tabindex="0"

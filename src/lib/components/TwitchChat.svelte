@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { onMount, afterUpdate } from 'svelte';
-	import { channels } from '$lib/stores/streams';
-	import type { Channel } from '$lib/types';
+	import { onMount } from 'svelte';
+	import type { Channel } from '../types';
 
 	export let channel: Channel;
 	export let width = '100%';

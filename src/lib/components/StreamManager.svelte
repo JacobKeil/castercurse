@@ -1,20 +1,14 @@
 <script lang="ts">
-	import {
-		render_source,
-		channels,
-		current_stream,
-		MAX_CHANNELS,
-		stream_manager_open,
-		toggle_hidden
-	} from '$lib/stores/streams';
+	import { render_source, channels, MAX_CHANNELS, stream_manager_open } from '$lib/stores/streams';
 	import { AddChannel, Settings, ToggleHidden, ToggleSource, Broadcast, TeamSection } from '$lib';
 	import { onMount } from 'svelte';
-	import { fly, slide } from 'svelte/transition';
+	import { slide } from 'svelte/transition';
 	import { page } from '$app/state';
 	import moment from 'moment';
 	import { current_event } from '$lib/stores/event';
 	import { fetch_live_data, handle_keydown } from '$lib/helpers';
 	import { supabase } from '$lib/supabase_client';
+	import Sortable from './sort/Sortable.svelte';
 
 	let is_logged_in: boolean = $state(false);
 
@@ -191,58 +185,7 @@
 			{#if $channels.length === 0}
 				<p class="text-gray-500">No streams picked...</p>
 			{/if}
-			{#each $channels as channel, i (channel.id)}
-				<div in:fly class="flex cursor-grab items-center justify-between rounded-md bg-zinc-800">
-					<div class="flex items-center gap-3 pl-4">
-						<i class="fa-sharp fa-solid fa-grip-dots mt-1 text-gray-500"></i>
-						<p class="mt-1 text-xs text-gray-500">{i + 1}</p>
-						<p
-							class:text-gray-300={$current_stream?.id === channel.id}
-							class:text-gray-500={$current_stream?.id !== channel.id}
-						>
-							{channel.handle}
-						</p>
-					</div>
-					<div class="flex items-center">
-						<div
-							class="group cursor-pointer px-3 py-2 hover:bg-zinc-700"
-							role="button"
-							tabindex="0"
-							onkeydown={(e) => {
-								handle_keydown(e, () => {
-									toggle_hidden(channel);
-								});
-							}}
-							onclick={() => {
-								toggle_hidden(channel);
-							}}
-						>
-							<i
-								class="fa-solid fa-eye fa-sm cursor-pointer"
-								class:text-gray-500={channel.hidden}
-								class:text-danger={!channel.hidden}
-							></i>
-						</div>
-						<div
-							class="group cursor-pointer rounded-r-md px-4 py-2 hover:bg-zinc-700"
-							role="button"
-							tabindex="0"
-							onkeydown={(e) => {
-								handle_keydown(e, () => {
-									$channels = $channels.filter((ch) => ch.id !== channel.id);
-								});
-							}}
-							onclick={() => {
-								$channels = $channels.filter((ch) => ch.id !== channel.id);
-							}}
-						>
-							<i
-								class="fa-solid fa-xmark cursor-pointer font-semibold text-gray-400 duration-200 group-hover:text-danger"
-							></i>
-						</div>
-					</div>
-				</div>
-			{/each}
+			<Sortable axis="y" variant="manager" />
 		</div>
 		<Settings />
 	</article>

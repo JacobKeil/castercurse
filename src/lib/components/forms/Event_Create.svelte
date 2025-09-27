@@ -3,8 +3,8 @@
 	import { onMount } from 'svelte';
 	import { Button, DateField, Dialog, SelectField, TextField, type MenuOption } from 'svelte-ux';
 	import { z } from 'zod';
-	import { ModalTitle, ImageUpload } from '$lib';
-	import { fetch_api, handle_keydown } from '$lib/helpers';
+	import { ModalTitle, ImageUpload } from '..';
+	import { fetch_api, handle_keydown } from '../../helpers';
 
 	let open = $state(false);
 	let image_file: File | null = $state(null);

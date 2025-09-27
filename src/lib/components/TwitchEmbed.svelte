@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { channels } from '$lib/stores/streams';
-	import type { Channel } from '$lib/types';
+	import { channels } from '../stores/streams';
+	import type { Channel } from '../types';
 
 	let {
 		initial_volume = 0.3,

@@ -1,19 +1,20 @@
 <script lang="ts">
-	import moment from 'moment';
-	import { TwitchVod } from '$lib';
+	import { TwitchVod } from '.';
 	import { Dialog, ProgressCircle } from 'svelte-ux';
 	import { writable } from 'svelte/store';
-	import { channels, render_source } from '$lib/stores/streams';
+	import { channels, mute_all, render_source } from '../stores/streams';
 	import { onMount } from 'svelte';
-	import { handle_keydown } from '$lib/helpers';
+	import { handle_keydown } from '../helpers';
 	import { PUBLIC_ORIGIN } from '$env/static/public';
-	import { supabase } from '$lib/supabase_client';
+	import { supabase } from '../supabase_client';
 
 	let {
 		small_icon = false,
+		list_hover = false,
 		handle
 	}: {
 		small_icon?: boolean;
+		list_hover?: boolean;
 		handle: string;
 	} = $props();
 
@@ -29,6 +30,16 @@
 			let endpoint = `${PUBLIC_ORIGIN}/api/vods_clips?handle=${handle}`;
 			let response = await fetch(endpoint);
 			let result = await response.json();
+
+			if (result.data.vods[0]) {
+				if (result.data.vods[0].thumbnail_url.includes('_404')) {
+					current_vod.set(result.data.vods[0].id);
+					video_open = true;
+				}
+			}
+
+			console.log(result.data);
+
 			return result.data;
 		};
 	});
@@ -59,6 +70,13 @@
 			promise = fetch_data();
 		}
 	});
+
+	$effect(() => {
+		if ($current_vod && video_open) {
+			open = false;
+			mute_all();
+		}
+	});
 </script>
 
 {#if small_icon}
@@ -75,6 +93,22 @@
 			});
 		}}
 	></i>
+{:else if list_hover}
+	<div
+		class="group cursor-pointer p-2 hover:bg-zinc-700"
+		role="button"
+		tabindex="0"
+		onkeydown={(e) => {
+			handle_keydown(e, () => {
+				open = !open;
+			});
+		}}
+		onclick={() => {
+			open = !open;
+		}}
+	>
+		<i class="fa-solid fa-camera-movie fa-sm mb-[3px] cursor-pointer text-zinc-400"></i>
+	</div>
 {:else}
 	<div
 		class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-zinc-700 py-1 duration-300 hover:bg-zinc-600"
@@ -101,81 +135,11 @@
 	class="max-h-[calc(100vh_-_5rem)] min-w-[400px] max-w-[calc(100vw_-_2rem)] p-4 mobile:max-w-[calc(100vw_-_10rem)]"
 >
 	{#await promise}
-		<div>
-			<h1 class="text-xl text-gray-500">Recent Vods</h1>
-			<hr class="mb-4 mt-2" />
-		</div>
 		<div class="flex h-full w-full items-center justify-center">
 			<ProgressCircle class="text-gray-500" />
 		</div>
 	{:then data}
-		{#if data}
-			<div>
-				<div class="flex items-center justify-between">
-					<div class="flex items-center gap-3 text-gray-500">
-						<h1 class="text-xl">Recent Vods</h1>
-						-
-						<h1 class="text-xl">{data.user.display_name}</h1>
-					</div>
-					<i
-						role="button"
-						tabindex="0"
-						onkeydown={(e) => {
-							handle_keydown(e, () => {
-								open = !open;
-							});
-						}}
-						onclick={() => {
-							open = !open;
-						}}
-						class="fa-solid fa-xmark cursor-pointer text-gray-500 hover:text-gray-400"
-					></i>
-				</div>
-				<hr class="mb-4 mt-2" />
-			</div>
-			<section>
-				{#if data.vods.length > 0}
-					<div class="grid grid-cols-1 gap-4 mobile:grid-cols-2 desktop:grid-cols-3">
-						{#each data.vods as vod}
-							<div
-								onclick={() => {
-									set_vod(vod.id);
-								}}
-								role="button"
-								tabindex="0"
-								onkeydown={(e) => {
-									handle_keydown(e, () => {
-										set_vod(vod.id);
-									});
-								}}
-								class="group relative min-h-[180px] w-full cursor-pointer rounded-md duration-100 hover:scale-105 mobile:h-[180px] mobile:w-[320px]"
-							>
-								<img
-									class="absolute bottom-0 left-0 right-0 top-0 rounded-md"
-									src={vod.thumbnail_url.replace('%{width}', '320').replace('%{height}', '180')}
-									alt=""
-								/>
-								<p
-									class="absolute left-2 right-2 top-2 z-10 w-fit rounded-lg bg-zinc-900 px-2 text-sm text-gray-400 opacity-80"
-								>
-									{vod.title}
-								</p>
-								<p class="absolute bottom-2 left-2 z-10 rounded-lg bg-zinc-900 px-2 text-gray-400">
-									{vod.view_count >= 1000
-										? Math.round(vod.view_count / 1000) + 'k'
-										: vod.view_count} views
-								</p>
-								<p class="absolute bottom-2 right-2 z-10 rounded-lg bg-zinc-900 px-2 text-gray-400">
-									{moment(vod.created_at).fromNow()}
-								</p>
-							</div>
-						{/each}
-					</div>
-				{:else}
-					<h1 class="text-lg text-gray-400">No recent vods.</h1>
-				{/if}
-			</section>
-		{:else}
+		{#if !data}
 			<div>
 				<div class="flex items-center gap-3 text-gray-500">
 					<h1 class="text-xl">Could not load recent vods!</h1>
@@ -200,9 +164,34 @@
 					<h1 class="whitespace-nowrap text-gray-200">Connect Twitch</h1>
 				</div>
 			</section>
+		{:else}
+			<h1 class="p-4 text-lg text-gray-400">Channel does not have a live VOD.</h1>
 		{/if}
 	{:catch error}
-		<h1>ERROR</h1>
+		<div>
+			<div class="flex items-center gap-3 text-gray-500">
+				<h1 class="text-xl">Could not load recent vod.</h1>
+			</div>
+			<hr class="mb-4 mt-2" />
+		</div>
+		<section>
+			<h1 class="text-lg text-gray-400">Connect your twitch account to unlock this feature!</h1>
+			<br />
+			<div
+				onclick={sign_in_with_twitch}
+				role="button"
+				tabindex="0"
+				onkeydown={(e) => {
+					handle_keydown(e, () => {
+						sign_in_with_twitch();
+					});
+				}}
+				class="flex cursor-pointer items-center justify-center gap-2 rounded-sm bg-[#6441a5] px-2 py-3 duration-300 hover:bg-[#7b57bd]"
+			>
+				<i class="fa-brands fa-twitch"></i>
+				<h1 class="whitespace-nowrap text-gray-200">Connect Twitch</h1>
+			</div>
+		</section>
 	{/await}
 </Dialog>
 

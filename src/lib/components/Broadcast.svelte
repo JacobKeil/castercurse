@@ -42,10 +42,12 @@
 								$channels = [
 									...$channels,
 									{
-										id: uniqueId(),
-										handle: String(broadcast?.handle),
+										id: broadcast ? broadcast.handle : '',
+										handle: broadcast ? broadcast.handle : '',
 										hidden: false,
-										muted: true
+										muted: true,
+										paused: false,
+										volume: 0.3
 									}
 								];
 							}

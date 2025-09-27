@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { TextField } from 'svelte-ux';
-	import { channels, MAX_CHANNELS } from '$lib/stores/streams';
-	import { uniqueId } from '@layerstack/utils';
-	import { handle_keydown } from '$lib/helpers';
+	import { channels, MAX_CHANNELS } from '../stores/streams';
+	import { handle_keydown } from '../helpers';
 
 	let search:
 		| string
