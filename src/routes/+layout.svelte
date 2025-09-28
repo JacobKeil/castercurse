@@ -67,10 +67,15 @@
 		let cookies_notice_store = localStorage.getItem('cookie_notice');
 		browser = window.navigator.userAgent;
 
-		if (!settings_store) localStorage.setItem('settings', JSON.stringify(default_settings));
-		cookie_notice_shown = !cookies_notice_store;
+		console.log(settings_store);
 
-		$settings = settings_store ? JSON.parse(settings_store) : default_settings;
+		if (settings_store) {
+			settings.set(JSON.parse(settings_store));
+		} else {
+			localStorage.setItem('settings', JSON.stringify(default_settings));
+		}
+
+		cookie_notice_shown = !cookies_notice_store;
 
 		document.addEventListener('keyup', (e) => {
 			if (parseInt(e.key) >= 1 && parseInt(e.key) <= 9 && !$stream_manager_open) {

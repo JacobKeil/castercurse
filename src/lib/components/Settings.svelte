@@ -1,21 +1,6 @@
 <script lang="ts">
 	import { settings } from '../stores/settings';
-	import { onMount } from 'svelte';
 	import { Switch } from 'svelte-ux';
-
-	let save_settings = () => {};
-
-	onMount(() => {
-		save_settings = () => {
-			localStorage.setItem('settings', JSON.stringify($settings));
-		};
-	});
-
-	$effect(() => {
-		if ($settings) {
-			save_settings();
-		}
-	});
 </script>
 
 <div class="w-full space-y-2 rounded-md bg-zinc-800 px-5 py-4">

@@ -1,27 +1,9 @@
 <script lang="ts">
 	import { settings } from '../stores/settings';
 	import { handle_keydown } from '../helpers';
-	import { onMount } from 'svelte';
-
-	let save_settings = () => {};
-
-	onMount(() => {
-		save_settings = () => {
-			localStorage.setItem('settings', JSON.stringify($settings));
-		};
-	});
-
-	$effect(() => {
-		if ($settings) {
-			save_settings();
-		}
-	});
 
 	function toggle_chat() {
-		settings.set({
-			...$settings,
-			open_chat: !$settings.open_chat
-		});
+		settings.update((s) => ({ ...s, open_chat: !s.open_chat }));
 	}
 </script>
 
