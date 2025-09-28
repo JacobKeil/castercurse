@@ -135,10 +135,10 @@
 					<i class="fa-solid fa-grid-2 text-red-400"></i>
 				</div>
 				<ToggleChat />
+				<ToggleHidden />
 				<div class="flex items-center gap-[5px]">
 					<Sortable axis="x" variant="tabs" />
 				</div>
-				<ToggleHidden />
 			{/if}
 			{#if home_screen}
 				<div class="flex items-center justify-center divide-x text-zinc-400">
