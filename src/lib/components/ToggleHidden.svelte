@@ -3,6 +3,8 @@
 	import { channels, unhide_all } from '../stores/streams';
 	import { cls } from '@layerstack/tailwind';
 	import { fly } from 'svelte/transition';
+
+	let { small = false }: { small?: boolean } = $props();
 </script>
 
 {#if $channels.length > 0 && $channels.filter((c) => c.hidden || c.paused).length > 0}
@@ -22,6 +24,10 @@
 			'flex h-full w-fit cursor-pointer select-none items-center gap-2 overflow-hidden rounded-lg bg-zinc-800 px-3 py-1 text-gray-500 duration-200 hover:bg-zinc-700'
 		)}
 	>
-		UNHIDE ALL
+		{#if !small}
+			UNHIDE ALL
+		{:else}
+			<i class="fa-solid fa-eye-slash"></i>
+		{/if}
 	</div>
 {/if}

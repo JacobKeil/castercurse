@@ -178,7 +178,7 @@
 					{$channels.length} / {MAX_CHANNELS}
 				</p>
 			</div>
-			<ToggleHidden />
+			<ToggleHidden small />
 			<ToggleSource />
 		</div>
 		<div class="flex h-fit flex-col gap-2">
