@@ -1,6 +1,14 @@
 <script lang="ts">
 	import { render_source, channels, MAX_CHANNELS, stream_manager_open } from '$lib/stores/streams';
-	import { AddChannel, Settings, ToggleHidden, ToggleSource, Broadcast, TeamSection } from '$lib';
+	import {
+		AddChannel,
+		Settings,
+		ToggleHidden,
+		ToggleSource,
+		Broadcast,
+		TeamSection,
+		FollowerSection
+	} from '$lib';
 	import { onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import { page } from '$app/state';
@@ -9,6 +17,7 @@
 	import { fetch_live_data, handle_keydown } from '$lib/helpers';
 	import { supabase } from '$lib/supabase_client';
 	import Sortable from './sort/Sortable.svelte';
+	import { fetch_followers_live_data, followers_live } from '$lib/stores/followers';
 
 	let is_logged_in: boolean = $state(false);
 
@@ -61,6 +70,8 @@
 	$effect(() => {
 		if ($stream_manager_open && page.url.pathname.includes('/events')) {
 			fetch_live_data();
+		} else if ($stream_manager_open && page.url.pathname.includes('/view')) {
+			fetch_followers_live_data();
 		}
 	});
 </script>
@@ -200,6 +211,29 @@
 						{/each}
 					{:else}
 						<p class="text-gray-500">No teams added to this event.</p>
+					{/if}
+				</div>
+			</div>
+		</article>
+	{:else}
+		<article>
+			<div class="space-y-2">
+				<h1 class="text-lg font-medium text-gray-400">Followed Channels</h1>
+
+				<div class="grid grid-cols-1 gap-2 tablet:grid-cols-3">
+					{#if $followers_live.length > 0}
+						{#each $followers_live as follower}
+							<FollowerSection
+								channel={{
+									handle: follower.handle,
+									display_name: follower.display_name,
+									is_live: true
+								}}
+								show_live_status={is_logged_in}
+							/>
+						{/each}
+					{:else}
+						<p class="text-gray-500">No followed channels are live.</p>
 					{/if}
 				</div>
 			</div>

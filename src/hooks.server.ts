@@ -31,7 +31,7 @@ const supabase_handle: Handle = async ({ event, resolve }) => {
 
 const auth_guard: Handle = async ({ event, resolve }) => {
 	const pathname = event.url.pathname;
-	const needsAuth = pathname.startsWith('/organize');
+	const needsAuth = pathname.startsWith('/organize') || pathname.startsWith('/api/followed');
 
 	if (needsAuth) {
 		const session = await event.locals.getSession();

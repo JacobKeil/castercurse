@@ -9,6 +9,7 @@ export { default as Settings } from './Settings.svelte';
 export { default as VodsClips } from './VodsClips.svelte';
 export { default as TwitchVod } from './TwitchVod.svelte';
 export { default as TeamSection } from './TeamSection.svelte';
+export { default as FollowerSection } from './FollowerSection.svelte';
 export { default as Broadcast } from './Broadcast.svelte';
 export { default as Event } from './Event.svelte';
 export { default as CookieNotice } from './CookieNotice.svelte';
