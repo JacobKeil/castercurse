@@ -187,7 +187,9 @@
 					<Toggle let:on={open} let:toggle let:toggleOff>
 						<Button on:click={toggle}>
 							<div class="flex items-center gap-3">
-								<Avatar size="sm"><img src={user?.user_metadata.avatar_url} alt="" /></Avatar>
+								<Avatar size="sm"
+									><img src={user?.user_metadata.avatar_url} class="rounded-full" alt="" /></Avatar
+								>
 							</div>
 							<Menu
 								{open}

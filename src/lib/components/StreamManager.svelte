@@ -236,6 +236,24 @@
 						<p class="text-gray-500">No followed channels are live.</p>
 					{/if}
 				</div>
+				<br />
+				<script
+					async
+					src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2106178219912204"
+					crossorigin="anonymous"
+				></script>
+				<!-- Horizontal Display -->
+				<ins
+					class="adsbygoogle"
+					style="display:block"
+					data-ad-client="ca-pub-2106178219912204"
+					data-ad-slot="2871264741"
+					data-ad-format="auto"
+					data-full-width-responsive="true"
+				></ins>
+				<script>
+					(adsbygoogle = window.adsbygoogle || []).push({});
+				</script>
 			</div>
 		</article>
 	{/if}

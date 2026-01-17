@@ -60,7 +60,10 @@
 		const { data, error } = await supabase.auth.signInWithOAuth({
 			provider: 'twitch',
 			options: {
-				redirectTo: `${PUBLIC_ORIGIN}/auth/callback`
+				redirectTo: `${PUBLIC_ORIGIN}/auth/callback`,
+				queryParams: {
+					scope: 'user:read:email user:read:follows'
+				}
 			}
 		});
 	}
